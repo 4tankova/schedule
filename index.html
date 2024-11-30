@@ -108,7 +108,24 @@
         <button class="btn" onclick="loadData()">Завантажити</button>
     </div>
 
-    <script>
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-app.js";
+        import { getDatabase, ref, set, get, child } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-database.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyAE6oa6rFWYsH-SvpGR-iBCmeC0IXLRd8A",
+            authDomain: "schedule-8aae6.firebaseapp.com",
+            databaseURL: "https://schedule-8aae6-default-rtdb.europe-west1.firebasedatabase.app",
+            projectId: "schedule-8aae6",
+            storageBucket: "schedule-8aae6.firebasestorage.app",
+            messagingSenderId: "309323392115",
+            appId: "1:309323392115:web:70229cd49ef40b0a7cf606",
+            measurementId: "G-WMDNHD9P9L"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+
         const people = [
             "Ковбасюк Едуард", "Гетьман Дмитро", "Тимчина Мар'ян", "Жуковський Михайло",
             "Петров Петро", "Радченко Олексій", "Кіблик Вадим", "Євгеній Іванисик",
@@ -162,8 +179,8 @@
         }
 
         function openDropdown(selectedElement) {
+            closeAllDropdowns();
             const dropdown = selectedElement.nextElementSibling;
-            document.querySelectorAll(".dropdown").forEach(d => d.style.display = "none");
             dropdown.style.display = "block";
         }
 
@@ -175,6 +192,53 @@
             dropdown.style.display = "none";
         }
 
+        function closeAllDropdowns() {
+            document.querySelectorAll(".dropdown").forEach(d => d.style.display = "none");
+        }
+
+        function saveData() {
+            const year = document.getElementById("year").value;
+            const month = document.getElementById("month").value;
+            const rows = Array.from(document.querySelectorAll("#table-body tr"));
+            const data = {
+                year,
+                month,
+                schedule: rows.map(row => ({
+                    name: row.cells[0].textContent.trim(),
+                    data: Array.from(row.cells).slice(1).map(cell => cell.querySelector(".selected").dataset.value || "")
+                }))
+            };
+
+            set(ref(db, "schedule"), data)
+                .then(() => alert("Дані успішно збережено в Firebase!"))
+                .catch((error) => console.error("Помилка збереження:", error));
+        }
+
+        function loadData() {
+            get(child(ref(db), "schedule"))
+                .then(snapshot => {
+                    if (snapshot.exists()) {
+                        const data = snapshot.val();
+                        document.getElementById("year").value = data.year;
+                        document.getElementById("month").value = data.month;
+                        generateTable();
+                        setTimeout(() => {
+                            const rows = document.querySelectorAll("#table-body tr");
+                            data.schedule.forEach((item, index) => {
+                                const cells = rows[index].querySelectorAll("td .selected");
+                                item.data.forEach((value, i) => {
+                                    cells[i].textContent = value;
+                                    cells[i].dataset.value = value;
+                                });
+                            });
+                        }, 100);
+                    } else {
+                        alert("Немає даних у Firebase.");
+                    }
+                })
+                .catch((error) => console.error("Помилка завантаження:", error));
+        }
+
         document.addEventListener("DOMContentLoaded", () => {
             initYear();
             generateTable();
@@ -182,7 +246,7 @@
 
         document.addEventListener("click", (event) => {
             if (!event.target.closest(".dropdown") && !event.target.closest(".selected")) {
-                document.querySelectorAll(".dropdown").forEach(d => d.style.display = "none");
+                closeAllDropdowns();
             }
         });
     </script>
