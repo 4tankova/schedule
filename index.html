@@ -196,49 +196,6 @@
             document.querySelectorAll(".dropdown").forEach(d => d.style.display = "none");
         }
 
-        function saveData() {
-            const year = document.getElementById("year").value;
-            const month = document.getElementById("month").value;
-            const rows = Array.from(document.querySelectorAll("#table-body tr"));
-            const data = {
-                year,
-                month,
-                schedule: rows.map(row => ({
-                    name: row.cells[0].textContent.trim(),
-                    data: Array.from(row.cells).slice(1).map(cell => cell.querySelector(".selected").dataset.value || "")
-                }))
-            };
-
-            set(ref(db, "schedule"), data)
-                .then(() => alert("Дані успішно збережено в Firebase!"))
-                .catch((error) => console.error("Помилка збереження:", error));
-        }
-
-        function loadData() {
-            get(child(ref(db), "schedule"))
-                .then(snapshot => {
-                    if (snapshot.exists()) {
-                        const data = snapshot.val();
-                        document.getElementById("year").value = data.year;
-                        document.getElementById("month").value = data.month;
-                        generateTable();
-                        setTimeout(() => {
-                            const rows = document.querySelectorAll("#table-body tr");
-                            data.schedule.forEach((item, index) => {
-                                const cells = rows[index].querySelectorAll("td .selected");
-                                item.data.forEach((value, i) => {
-                                    cells[i].textContent = value;
-                                    cells[i].dataset.value = value;
-                                });
-                            });
-                        }, 100);
-                    } else {
-                        alert("Немає даних у Firebase.");
-                    }
-                })
-                .catch((error) => console.error("Помилка завантаження:", error));
-        }
-
         document.addEventListener("DOMContentLoaded", () => {
             initYear();
             generateTable();
