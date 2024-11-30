@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ЗППМ Асґард</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f4f4f9;
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+        .controls {
+            text-align: center;
+            margin: 20px 0;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        th, td {
+            border: 1px solid #ddd;
+            text-align: center;
+            padding: 8px;
+            position: relative;
+        }
+        th {
+            background-color: #007bff;
+            color: white;
+        }
+        tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+        tr:nth-child(odd) {
+            background-color: #ffffff;
+        }
+        .dropdown {
+            position: absolute;
+            display: none;
+            z-index: 10;
+            background-color: #fff;
+            border: 1px solid #ccc;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .dropdown div {
+            padding: 8px;
+            cursor: pointer;
+            text-align: left;
+        }
+        .dropdown div:hover {
+            background-color: #f1f1f1;
+        }
+        .selected {
+            cursor: pointer;
+            text-align: center;
+        }
+        .btn {
+            margin: 10px 5px;
+            padding: 10px 20px;
+            font-size: 16px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+        }
+        .btn:hover {
+            background-color: #0056b3;
+            transform: scale(1.05);
+        }
+    </style>
+</head>
+<body>
+    <h1>ЗППМ Асґард</h1>
+    <div class="controls">
+        <label for="year">Рік:</label>
+        <select id="year"></select>
+        <label for="month">Місяць:</label>
+        <select id="month">
+            <option value="0">Січень</option>
+            <option value="1">Лютий</option>
+            <option value="2">Березень</option>
+            <option value="3">Квітень</option>
+            <option value="4">Травень</option>
+            <option value="5">Червень</option>
+            <option value="6">Липень</option>
+            <option value="7">Серпень</option>
+            <option value="8">Вересень</option>
+            <option value="9">Жовтень</option>
+            <option value="10">Листопад</option>
+            <option value="11">Грудень</option>
+        </select>
+        <button onclick="generateTable()">Оновити</button>
+    </div>
+    <table>
+        <thead id="table-head"></thead>
+        <tbody id="table-body"></tbody>
+    </table>
+    <div class="controls">
+        <button class="btn" onclick="saveData()">Зберегти</button>
+        <button class="btn" onclick="loadData()">Завантажити</button>
+    </div>
+
+    <script>
+        const people = [
+            "Ковбасюк Едуард", "Гетьман Дмитро", "Тимчина Мар'ян", "Жуковський Михайло",
+            "Петров Петро", "Радченко Олексій", "Кіблик Вадим", "Євгеній Іванисик",
+            "Пуригін Вадим", "Харевич Віктор", "М'ясалюк Ігор", "Ткаченко Олександр",
+            "Бодвіч Степан", "Костюні Олександр", "Плаксієнко Сергій", "Шміголь Юрій",
+            "Канюс Руслан", "Гриценко Миколай"
+        ];
+
+        const actions = {
+            "+": "Присутній",
+            "-": "Відсутній",
+            "н": "Наряд",
+            "бр": "Виїзд",
+            "в": "Відпустка",
+            "": " "
+        };
+
+        let backupData = null;
+
+        function initYear() {
+            const yearSelect = document.getElementById("year");
+            const currentYear = new Date().getFullYear();
+            for (let i = currentYear - 2; i <= currentYear + 2; i++) {
+                const option = document.createElement("option");
+                option.value = i;
+                option.textContent = i;
+                if (i === currentYear) option.selected = true;
+                yearSelect.appendChild(option);
+            }
+        }
+
+        function generateTable() {
+            const year = parseInt(document.getElementById("year").value);
+            const month = parseInt(document.getElementById("month").value);
+            const daysInMonth = new Date(year, month + 1, 0).getDate();
+
+            const tableHead = document.getElementById("table-head");
+            const tableBody = document.getElementById("table-body");
+
+            tableHead.innerHTML = "<tr><th>Імена</th>" + Array.from({ length: daysInMonth }, (_, i) => `<th>${i + 1}</th>`).join("") + "</tr>";
+
+            tableBody.innerHTML = people.map(person => {
+                const cells = Array.from({ length: daysInMonth }, () => `
+                    <td>
+                        <div class="selected" onclick="openDropdown(this)"> </div>
+                        <div class="dropdown">
+                            ${Object.entries(actions).map(([short, full]) => `<div onclick="selectOption(event, '${short}')">${full}</div>`).join("")}
+                        </div>
+                    </td>
+                `).join("");
+                return `<tr><td><strong>${person}</strong></td>${cells}</tr>`;
+            }).join("");
+        }
+
+        function openDropdown(selectedElement) {
+            const dropdown = selectedElement.nextElementSibling;
+            document.querySelectorAll(".dropdown").forEach(d => d.style.display = "none");
+            dropdown.style.display = "block";
+        }
+
+        function selectOption(event, value) {
+            const dropdown = event.target.parentElement;
+            const selectedDiv = dropdown.previousElementSibling;
+            selectedDiv.textContent = value; // Відображати короткий варіант
+            selectedDiv.dataset.value = value;
+            dropdown.style.display = "none";
+        }
+
+        function saveData() {
+            const year = document.getElementById("year").value;
+            const month = document.getElementById("month").selectedIndex + 1;
+            const rows = Array.from(document.querySelectorAll("#table-body tr"));
+            backupData = {
+                year,
+                month,
+                schedule: rows.map(row => ({
+                    name: row.cells[0].textContent.trim(),
+                    data: Array.from(row.cells).slice(1).map(cell => cell.querySelector(".selected").dataset.value || "")
+                }))
+            };
+            alert("Дані збережено!");
+        }
+
+        function loadData() {
+            if (backupData) {
+                const { year, month, schedule } = backupData;
+                document.getElementById("year").value = year;
+                document.getElementById("month").selectedIndex = month - 1;
+                generateTable();
+                setTimeout(() => {
+                    const rows = Array.from(document.querySelectorAll("#table-body tr"));
+                    schedule.forEach((item, index) => {
+                        const cells = rows[index].querySelectorAll("td .selected");
+                        item.data.forEach((value, i) => {
+                            cells[i].textContent = value; // Відображати короткий варіант
+                            cells[i].dataset.value = value;
+                        });
+                    });
+                }, 100);
+                alert("Дані успішно завантажено!");
+            } else {
+                alert("Немає збережених даних!");
+            }
+        }
+
+        document.addEventListener("DOMContentLoaded", () => {
+            initYear();
+            generateTable();
+        });
+
+        document.addEventListener("click", (event) => {
+            if (!event.target.closest(".dropdown") && !event.target.closest(".selected")) {
+                document.querySelectorAll(".dropdown").forEach(d => d.style.display = "none");
+            }
+        });
+    </script>
+</body>
+</html>
