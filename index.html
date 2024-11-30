@@ -126,8 +126,6 @@
             "": " "
         };
 
-        let backupData = null;
-
         function initYear() {
             const yearSelect = document.getElementById("year");
             const currentYear = new Date().getFullYear();
@@ -172,46 +170,9 @@
         function selectOption(event, value) {
             const dropdown = event.target.parentElement;
             const selectedDiv = dropdown.previousElementSibling;
-            selectedDiv.textContent = value; // Відображати короткий варіант
+            selectedDiv.textContent = value;
             selectedDiv.dataset.value = value;
             dropdown.style.display = "none";
-        }
-
-        function saveData() {
-            const year = document.getElementById("year").value;
-            const month = document.getElementById("month").selectedIndex + 1;
-            const rows = Array.from(document.querySelectorAll("#table-body tr"));
-            backupData = {
-                year,
-                month,
-                schedule: rows.map(row => ({
-                    name: row.cells[0].textContent.trim(),
-                    data: Array.from(row.cells).slice(1).map(cell => cell.querySelector(".selected").dataset.value || "")
-                }))
-            };
-            alert("Дані збережено!");
-        }
-
-        function loadData() {
-            if (backupData) {
-                const { year, month, schedule } = backupData;
-                document.getElementById("year").value = year;
-                document.getElementById("month").selectedIndex = month - 1;
-                generateTable();
-                setTimeout(() => {
-                    const rows = Array.from(document.querySelectorAll("#table-body tr"));
-                    schedule.forEach((item, index) => {
-                        const cells = rows[index].querySelectorAll("td .selected");
-                        item.data.forEach((value, i) => {
-                            cells[i].textContent = value; // Відображати короткий варіант
-                            cells[i].dataset.value = value;
-                        });
-                    });
-                }, 100);
-                alert("Дані успішно завантажено!");
-            } else {
-                alert("Немає збережених даних!");
-            }
         }
 
         document.addEventListener("DOMContentLoaded", () => {
