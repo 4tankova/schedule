@@ -3,202 +3,39 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Розрахунок витрати палива</title>
+    <title>4ОТБр</title>
     <link rel="icon" type="image/x-icon" href="favicon.ico">
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 20px;
-            padding: 0;
-            background-color: #fff;
-            color: #000;
-        }
-        .container {
-            max-width: 600px;
-            margin: auto;
-            padding: 20px;
-            background: #f9f9f9;
-            border-radius: 8px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            text-align: center;
-        }
-        .logo {
-            display: block;
-            max-width: 150px;
-            margin: 0 auto 10px;
-        }
-        .sub-title {
-            font-size: 24px;
-            font-weight: bold;
-            margin: 10px 0 20px;
-        }
-        .sub-title a {
-            text-decoration: none;
-            color: #f4d03f;
-        }
-        .sub-title a:hover {
-            text-decoration: underline;
-        }
-        h1 {
-            text-align: center;
-            color: #444;
-        }
-        label {
-            font-weight: bold;
-        }
-        input {
-            width: 100%;
-            padding: 8px;
-            margin: 10px 0;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-            background-color: #fff;
-            color: #000;
-        }
-        button {
-            background-color: #007bff;
-            color: white;
-            padding: 10px;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            width: 100%;
-        }
-        button:hover {
-            background-color: #0056b3;
-        }
-        .result {
-            margin-top: 20px;
-            padding: 10px;
-            background-color: #d4edda;
-            border: 1px solid #c3e6cb;
-            border-radius: 4px;
-            color: #155724;
-            font-weight: bold;
-        }
-        .formula {
-            margin-top: 10px;
-            font-size: 18px;
-            font-weight: bold;
-            background: #fff;
-            padding: 10px;
-            border: 1px solid #ccc;
-            border-radius: 8px;
-            text-align: center;
-            font-family: "Courier New", Courier, monospace;
-        }
-        .fraction {
-            display: inline-block;
-            text-align: center;
-            vertical-align: middle;
-        }
-        .fraction .top {
-            border-bottom: 2px solid #000;
-            display: block;
-            padding: 0 5px;
-        }
-        .fraction .bottom {
-            display: block;
-            padding: 0 5px;
-        }
-        .footer {
-            margin-top: 30px;
-            font-size: 12px;
-            color: #555;
-            text-align: center;
-        }
-        .footer a {
-            text-decoration: none;
-            color: #007bff;
-            font-weight: bold;
-        }
-        .footer a:hover {
-            text-decoration: underline;
-        }
-    </style>
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 </head>
 <body>
     <div class="container">
-        <a href="https://www.facebook.com/4tankova" target="_blank">
-            <img src="logo.png" alt="Логотип" class="logo">
-        </a>
-        <div class="sub-title">
-            <a href="https://www.facebook.com/4tankova" target="_blank">4 ОТБр</a>
+        <!-- Логотип -->
+        <div class="logo-container">
+            <a href="https://www.facebook.com/4tankova" target="_blank">
+                <img src="logo4.png" alt="Логотип" class="logo">
+            </a>
         </div>
-        <h1>Розрахунок витрати палива</h1>
-        <form id="fuel-form">
-            <label for="a">A (нормативна витрата палива, л/100 км):</label>
-            <input type="number" id="a" placeholder="Введіть значення A">
 
-            <label for="b">B (км з вантажем):</label>
-            <input type="number" id="b" placeholder="Введіть значення B">
-
-            <label for="v">V (км без вантажу):</label>
-            <input type="number" id="v" placeholder="Введіть значення V">
-
-            <label for="g">G (відпрацьовано мотогодин):</label>
-            <input type="number" id="g" placeholder="Введіть значення G">
-
-            <button type="button" onclick="calculateFuel()">Розрахувати</button>
-        </form>
-
-        <div id="result" class="result" style="display: none;"></div>
-        <div id="formula" class="formula" style="display: none;"></div>
-        <div class="footer">
-            <a href="https://www.facebook.com/profile.php?id=100001232615511" target="_blank">created by ODIN</a>
+        <!-- Кнопки -->
+        <div class="button-group">
+            <button class="custom-button" onclick="openTab('fuel.html')">Паливо</button>
+            <button class="custom-button" onclick="openTab('oil.html')">Мастило</button>
+            <button class="custom-button" onclick="openTab('adblue.html')">Adblue</button>
         </div>
+
+        <!-- Footer -->
+        <footer>
+            <a href="https://www.facebook.com/profile.php?id=100001232615511" target="_blank">
+                Created by ODIN
+            </a>
+        </footer>
     </div>
 
     <script>
-        function calculateFuel() {
-            // Отримання значень з полів або встановлення значення 0, якщо поле порожнє
-            const a = parseFloat(document.getElementById("a").value) || 0;
-            const b = parseFloat(document.getElementById("b").value) || 0;
-            const v = parseFloat(document.getElementById("v").value) || 0;
-            const g = parseFloat(document.getElementById("g").value) || 0;
-
-            // Розрахунок з урахуванням округлення
-            const fuelWithLoad = Math.round((a / 100) * b * 1.2);
-            const fuelWithoutLoad = Math.round((a / 100) * v);
-            const fuelByHours = Math.round(g * 25 * (a / 100));
-            const totalFuel = fuelWithLoad + fuelWithoutLoad + fuelByHours;
-
-            // Формування тексту формули
-            const formulaHTML = `
-                <div>
-                    <span class="fraction">
-                        <span class="top">${b} км × ${a} л</span>
-                        <span class="bottom">100</span>
-                    </span>
-                    × 1.2 = ${fuelWithLoad} л
-                </div>
-                <div>
-                    <span class="fraction">
-                        <span class="top">${v} км × ${a} л</span>
-                        <span class="bottom">100</span>
-                    </span>
-                    = ${fuelWithoutLoad} л
-                </div>
-                <div>
-                    <span class="fraction">
-                        <span class="top">${g} м/г × 25 км × ${a} л</span>
-                        <span class="bottom">100</span>
-                    </span>
-                    = ${fuelByHours} л
-                </div>
-                <div><strong>Всього витрачено:</strong> ${fuelWithoutLoad} л + ${fuelWithLoad} л + ${fuelByHours} л = ${totalFuel} л</div>
-            `;
-
-            // Виведення результату
-            const resultDiv = document.getElementById("result");
-            const formulaDiv = document.getElementById("formula");
-
-            resultDiv.style.display = "block";
-            resultDiv.innerHTML = `Обсяг списаного палива: <strong>${totalFuel}</strong> л.`;
-
-            // Виведення формули
-            formulaDiv.style.display = "block";
-            formulaDiv.innerHTML = formulaHTML;
+        // Відкрити нову вкладку
+        function openTab(url) {
+            window.open(url, '_blank');
         }
     </script>
 </body>
