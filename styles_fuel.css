@@ -66,6 +66,20 @@ form input {
     transform: translateY(-2px);
 }
 
+/* Результат */
+.result {
+    margin-top: 20px;
+    padding: 15px;
+    background: rgba(0, 128, 0, 0.2); /* Прозоре зелене підсвічування */
+    border-radius: 6px;
+    border: 1px solid rgba(0, 128, 0, 0.5);
+    color: white;
+    font-weight: bold;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+    font-size: 1.2em;
+    text-align: center;
+}
+
 /* Формула */
 .formula {
     margin-top: 20px;
