@@ -3,209 +3,203 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ЗППМ Асґард</title>
+    <title>Розрахунок витрати палива</title>
+    <link rel="icon" type="image/x-icon" href="favicon.ico">
     <style>
         body {
             font-family: Arial, sans-serif;
             margin: 20px;
-            background-color: #f4f4f9;
+            padding: 0;
+            background-color: #fff;
+            color: #000;
+        }
+        .container {
+            max-width: 600px;
+            margin: auto;
+            padding: 20px;
+            background: #f9f9f9;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+        .logo {
+            display: block;
+            max-width: 150px;
+            margin: 0 auto 10px;
+        }
+        .sub-title {
+            font-size: 24px;
+            font-weight: bold;
+            margin: 10px 0 20px;
+        }
+        .sub-title a {
+            text-decoration: none;
+            color: #f4d03f;
+        }
+        .sub-title a:hover {
+            text-decoration: underline;
         }
         h1 {
             text-align: center;
-            color: #333;
+            color: #444;
         }
-        .controls {
-            text-align: center;
-            margin: 20px 0;
+        label {
+            font-weight: bold;
         }
-        table {
+        input {
             width: 100%;
-            border-collapse: collapse;
-            margin-top: 20px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-        }
-        th, td {
-            border: 1px solid #ddd;
-            text-align: center;
             padding: 8px;
-            position: relative;
-        }
-        th {
-            background-color: #007bff;
-            color: white;
-        }
-        tr:nth-child(even) {
-            background-color: #f9f9f9;
-        }
-        tr:nth-child(odd) {
-            background-color: #ffffff;
-        }
-        .dropdown {
-            position: absolute;
-            display: none;
-            z-index: 10;
-            background-color: #fff;
+            margin: 10px 0;
             border: 1px solid #ccc;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            border-radius: 4px;
+            background-color: #fff;
+            color: #000;
         }
-        .dropdown div {
-            padding: 8px;
-            cursor: pointer;
-            text-align: left;
-        }
-        .dropdown div:hover {
-            background-color: #f1f1f1;
-        }
-        .selected {
-            cursor: pointer;
-            text-align: center;
-        }
-        .btn {
-            margin: 10px 5px;
-            padding: 10px 20px;
-            font-size: 16px;
+        button {
             background-color: #007bff;
             color: white;
+            padding: 10px;
             border: none;
-            border-radius: 5px;
+            border-radius: 4px;
             cursor: pointer;
-            transition: background-color 0.3s ease, transform 0.2s ease;
+            width: 100%;
         }
-        .btn:hover {
+        button:hover {
             background-color: #0056b3;
-            transform: scale(1.05);
+        }
+        .result {
+            margin-top: 20px;
+            padding: 10px;
+            background-color: #d4edda;
+            border: 1px solid #c3e6cb;
+            border-radius: 4px;
+            color: #155724;
+            font-weight: bold;
+        }
+        .formula {
+            margin-top: 10px;
+            font-size: 18px;
+            font-weight: bold;
+            background: #fff;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            text-align: center;
+            font-family: "Courier New", Courier, monospace;
+        }
+        .fraction {
+            display: inline-block;
+            text-align: center;
+            vertical-align: middle;
+        }
+        .fraction .top {
+            border-bottom: 2px solid #000;
+            display: block;
+            padding: 0 5px;
+        }
+        .fraction .bottom {
+            display: block;
+            padding: 0 5px;
+        }
+        .footer {
+            margin-top: 30px;
+            font-size: 12px;
+            color: #555;
+            text-align: center;
+        }
+        .footer a {
+            text-decoration: none;
+            color: #007bff;
+            font-weight: bold;
+        }
+        .footer a:hover {
+            text-decoration: underline;
         }
     </style>
 </head>
 <body>
-    <h1>ЗППМ Асґард</h1>
-    <div class="controls">
-        <label for="year">Рік:</label>
-        <select id="year"></select>
-        <label for="month">Місяць:</label>
-        <select id="month">
-            <option value="0">Січень</option>
-            <option value="1">Лютий</option>
-            <option value="2">Березень</option>
-            <option value="3">Квітень</option>
-            <option value="4">Травень</option>
-            <option value="5">Червень</option>
-            <option value="6">Липень</option>
-            <option value="7">Серпень</option>
-            <option value="8">Вересень</option>
-            <option value="9">Жовтень</option>
-            <option value="10">Листопад</option>
-            <option value="11">Грудень</option>
-        </select>
-        <button onclick="generateTable()">Оновити</button>
+    <div class="container">
+        <a href="https://www.facebook.com/4tankova" target="_blank">
+            <img src="logo.png" alt="Логотип" class="logo">
+        </a>
+        <div class="sub-title">
+            <a href="https://www.facebook.com/4tankova" target="_blank">4 ОТБр</a>
+        </div>
+        <h1>Розрахунок витрати палива</h1>
+        <form id="fuel-form">
+            <label for="a">A (нормативна витрата палива, л/100 км):</label>
+            <input type="number" id="a" placeholder="Введіть значення A">
+
+            <label for="b">B (км з вантажем):</label>
+            <input type="number" id="b" placeholder="Введіть значення B">
+
+            <label for="v">V (км без вантажу):</label>
+            <input type="number" id="v" placeholder="Введіть значення V">
+
+            <label for="g">G (відпрацьовано мотогодин):</label>
+            <input type="number" id="g" placeholder="Введіть значення G">
+
+            <button type="button" onclick="calculateFuel()">Розрахувати</button>
+        </form>
+
+        <div id="result" class="result" style="display: none;"></div>
+        <div id="formula" class="formula" style="display: none;"></div>
+        <div class="footer">
+            <a href="https://www.facebook.com/profile.php?id=100001232615511" target="_blank">created by ODIN</a>
+        </div>
     </div>
-    <table>
-        <thead id="table-head"></thead>
-        <tbody id="table-body"></tbody>
-    </table>
-    <div class="controls">
-        <button class="btn" onclick="saveData()">Зберегти</button>
-        <button class="btn" onclick="loadData()">Завантажити</button>
-    </div>
 
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-app.js";
-        import { getDatabase, ref, set, get, child } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-database.js";
+    <script>
+        function calculateFuel() {
+            // Отримання значень з полів або встановлення значення 0, якщо поле порожнє
+            const a = parseFloat(document.getElementById("a").value) || 0;
+            const b = parseFloat(document.getElementById("b").value) || 0;
+            const v = parseFloat(document.getElementById("v").value) || 0;
+            const g = parseFloat(document.getElementById("g").value) || 0;
 
-        const firebaseConfig = {
-            apiKey: "AIzaSyAE6oa6rFWYsH-SvpGR-iBCmeC0IXLRd8A",
-            authDomain: "schedule-8aae6.firebaseapp.com",
-            databaseURL: "https://schedule-8aae6-default-rtdb.europe-west1.firebasedatabase.app",
-            projectId: "schedule-8aae6",
-            storageBucket: "schedule-8aae6.firebasestorage.app",
-            messagingSenderId: "309323392115",
-            appId: "1:309323392115:web:70229cd49ef40b0a7cf606",
-            measurementId: "G-WMDNHD9P9L"
-        };
+            // Розрахунок з урахуванням округлення
+            const fuelWithLoad = Math.round((a / 100) * b * 1.2);
+            const fuelWithoutLoad = Math.round((a / 100) * v);
+            const fuelByHours = Math.round(g * 25 * (a / 100));
+            const totalFuel = fuelWithLoad + fuelWithoutLoad + fuelByHours;
 
-        const app = initializeApp(firebaseConfig);
-        const db = getDatabase(app);
+            // Формування тексту формули
+            const formulaHTML = `
+                <div>
+                    <span class="fraction">
+                        <span class="top">${b} км × ${a} л</span>
+                        <span class="bottom">100</span>
+                    </span>
+                    × 1.2 = ${fuelWithLoad} л
+                </div>
+                <div>
+                    <span class="fraction">
+                        <span class="top">${v} км × ${a} л</span>
+                        <span class="bottom">100</span>
+                    </span>
+                    = ${fuelWithoutLoad} л
+                </div>
+                <div>
+                    <span class="fraction">
+                        <span class="top">${g} м/г × 25 км × ${a} л</span>
+                        <span class="bottom">100</span>
+                    </span>
+                    = ${fuelByHours} л
+                </div>
+                <div><strong>Всього витрачено:</strong> ${fuelWithoutLoad} л + ${fuelWithLoad} л + ${fuelByHours} л = ${totalFuel} л</div>
+            `;
 
-        const people = [
-            "Ковбасюк Едуард", "Гетьман Дмитро", "Тимчина Мар'ян", "Жуковський Михайло",
-            "Петров Петро", "Радченко Олексій", "Кіблик Вадим", "Євгеній Іванисик",
-            "Пуригін Вадим", "Харевич Віктор", "М'ясалюк Ігор", "Ткаченко Олександр",
-            "Бодвіч Степан", "Костюні Олександр", "Плаксієнко Сергій", "Шміголь Юрій",
-            "Канюс Руслан", "Гриценко Миколай"
-        ];
+            // Виведення результату
+            const resultDiv = document.getElementById("result");
+            const formulaDiv = document.getElementById("formula");
 
-        const actions = {
-            "+": "Присутній",
-            "-": "Відсутній",
-            "н": "Наряд",
-            "бр": "Виїзд",
-            "в": "Відпустка",
-            "": " "
-        };
+            resultDiv.style.display = "block";
+            resultDiv.innerHTML = `Обсяг списаного палива: <strong>${totalFuel}</strong> л.`;
 
-        function initYear() {
-            const yearSelect = document.getElementById("year");
-            const currentYear = new Date().getFullYear();
-            for (let i = currentYear - 2; i <= currentYear + 2; i++) {
-                const option = document.createElement("option");
-                option.value = i;
-                option.textContent = i;
-                if (i === currentYear) option.selected = true;
-                yearSelect.appendChild(option);
-            }
+            // Виведення формули
+            formulaDiv.style.display = "block";
+            formulaDiv.innerHTML = formulaHTML;
         }
-
-        function generateTable() {
-            const year = parseInt(document.getElementById("year").value);
-            const month = parseInt(document.getElementById("month").value);
-            const daysInMonth = new Date(year, month + 1, 0).getDate();
-
-            const tableHead = document.getElementById("table-head");
-            const tableBody = document.getElementById("table-body");
-
-            tableHead.innerHTML = "<tr><th>Імена</th>" + Array.from({ length: daysInMonth }, (_, i) => `<th>${i + 1}</th>`).join("") + "</tr>";
-
-            tableBody.innerHTML = people.map(person => {
-                const cells = Array.from({ length: daysInMonth }, () => `
-                    <td>
-                        <div class="selected" onclick="openDropdown(this)"> </div>
-                        <div class="dropdown">
-                            ${Object.entries(actions).map(([short, full]) => `<div onclick="selectOption(event, '${short}')">${full}</div>`).join("")}
-                        </div>
-                    </td>
-                `).join("");
-                return `<tr><td><strong>${person}</strong></td>${cells}</tr>`;
-            }).join("");
-        }
-
-        function openDropdown(selectedElement) {
-            closeAllDropdowns();
-            const dropdown = selectedElement.nextElementSibling;
-            dropdown.style.display = "block";
-        }
-
-        function selectOption(event, value) {
-            const dropdown = event.target.parentElement;
-            const selectedDiv = dropdown.previousElementSibling;
-            selectedDiv.textContent = value;
-            selectedDiv.dataset.value = value;
-            dropdown.style.display = "none";
-        }
-
-        function closeAllDropdowns() {
-            document.querySelectorAll(".dropdown").forEach(d => d.style.display = "none");
-        }
-
-        document.addEventListener("DOMContentLoaded", () => {
-            initYear();
-            generateTable();
-        });
-
-        document.addEventListener("click", (event) => {
-            if (!event.target.closest(".dropdown") && !event.target.closest(".selected")) {
-                closeAllDropdowns();
-            }
-        });
     </script>
 </body>
 </html>
