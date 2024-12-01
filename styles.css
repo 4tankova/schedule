@@ -1,0 +1,77 @@
+/* Global Styling */
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: linear-gradient(135deg, #1e3c72, #2a5298);
+    color: white;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+
+/* Container */
+.container {
+    text-align: center;
+    width: 80%;
+    max-width: 600px;
+}
+
+/* Logo */
+.logo-container {
+    margin-top: 20px;
+}
+
+.logo {
+    width: 150px;
+    height: auto;
+    cursor: pointer;
+    transition: transform 0.3s ease, opacity 0.3s ease;
+}
+
+.logo:hover {
+    transform: scale(1.1);
+    opacity: 0.8;
+}
+
+/* Buttons */
+.button-group {
+    margin-top: 50px;
+}
+
+.custom-button {
+    background: linear-gradient(135deg, #ff7e5f, #feb47b);
+    border: none;
+    padding: 15px 30px;
+    font-size: 18px;
+    font-weight: bold;
+    color: white;
+    border-radius: 50px;
+    margin: 10px;
+    cursor: pointer;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    transition: all 0.3s ease;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+}
+
+.custom-button:hover {
+    background: linear-gradient(135deg, #feb47b, #ff7e5f);
+    transform: translateY(-5px) scale(1.05);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.4);
+}
+
+/* Footer */
+footer {
+    margin-top: 50px;
+    font-size: 14px;
+}
+
+footer a {
+    color: #FFEB3B;
+    text-decoration: none;
+}
+
+footer a:hover {
+    text-decoration: underline;
+}
