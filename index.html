@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html lang="uk" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fuel Calculator Pro</title>
+    <link rel="icon" type="image/x-icon" href="favicon.ico">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" integrity="sha512-9usAa10IRO0HhonpyAIVpjrylPvoDwiPUiKdWk5t3PyolY1cOd4DSE0Ga+ri4AuTroPR5aQvXU9xC6qOPnzFeg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
+    <style>
+        :root {
+            --background-color: #1a1a1a;
+            --text-color: #fff;
+            --accent-color: #3498db;
+            --input-background: rgba(255, 255, 255, 0.1);
+            --input-placeholder: #ccc;
+            --secondary-text: #ccc;
+        }
+        [data-theme='light'] {
+            --background-color: #f8f8f8;
+            --text-color: #333;
+            --accent-color: #2c3e50;
+            --input-background: rgba(0, 0, 0, 0.05);
+            --input-placeholder: #777;
+            --secondary-text: #777;
+        }
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: var(--background-color);
+            color: var(--text-color);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            overflow-y: auto;
+            transition: background-color 0.3s ease;
+            position: relative;
+        }
+        body::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200vw;
+            height: 200vh;
+            background: url('apple-touch-icon.png') repeat;
+            background-size: 500px 500px; /* Adjust as needed */
+            opacity: 0.05;
+            animation: moveBackground 120s linear infinite;
+            z-index: -1;
+            pointer-events: none;
+            transition: background-size 0.3s ease;
+        }
+
+        @keyframes moveBackground {
+            from { background-position: 0 0; }
+            to { background-position: 1000px 1000px; }
+        }
+
+        .container {
+            max-width: 700px;
+            width: 90%;
+            padding: 40px;
+            background: var(--input-background);
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            text-align: center;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
+            margin: 20px;
+        }
+        .container:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 35px rgba(0, 0, 0, 0.4);
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+        }
+        .logo-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+            flex: 1; /* Займає доступний простір */
+        }
+        .logo-container a{
+             display: flex;
+             flex-direction: column;
+             align-items: center;
+           }
+
+        .logo {
+            max-width: 80px;
+            border-radius: 50%;
+            transition: transform 0.3s ease;
+        }
+        .logo:hover {
+            transform: scale(1.1);
+        }
+
+        .sub-title {
+            font-size: 22px;
+            font-weight: 500;
+            letter-spacing: 1.5px;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+        }
+        .sub-title a {
+            text-decoration: none;
+            color: var(--text-color);
+            transition: color 0.3s ease;
+        }
+
+        .sub-title a:hover {
+            text-decoration: underline;
+            color: var(--secondary-text);
+        }
+        h1 {
+            font-size: 34px;
+            margin-bottom: 25px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .theme-toggle-container{
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .theme-toggle {
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 20px;
+            color: var(--text-color);
+            outline: none;
+            padding: 0;
+            transition: color 0.3s ease, transform 0.3s ease;
+        }
+
+        .theme-toggle:hover{
+            transform: rotate(15deg);
+            color: var(--accent-color);
+        }
+
+        .theme-toggle .bi-sun-fill,
+        .theme-toggle .bi-moon-fill {
+            display: none;
+        }
+
+        [data-theme="light"] .theme-toggle .bi-sun-fill {
+            display: inline-block;
+        }
+        [data-theme="dark"] .theme-toggle .bi-moon-fill {
+            display: inline-block;
+        }
+        label {
+            display: block;
+            text-align: left;
+            font-weight: 500;
+            margin-bottom: 8px;
+            color: var(--secondary-text);
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.2);
+        }
+
+        input {
+            width: calc(100% - 30px);
+            padding: 14px 15px;
+            margin: 10px 0 20px;
+            border: none;
+            border-radius: 10px;
+            background: var(--input-background);
+            color: var(--text-color);
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+            outline: none;
+        }
+        input::placeholder{
+            color: var(--input-placeholder);
+        }
+        input:focus {
+            box-shadow: 0 0 8px rgba(255, 255, 255, 0.3);
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        button {
+            background: linear-gradient(to right, #2980b9, #6dd5fa);
+            color: #fff;
+            padding: 15px 25px;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            width: calc(100% - 30px);
+            font-size: 18px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+        }
+
+        button:hover {
+            background: linear-gradient(to right, #3498db, #99d9f8);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.4);
+        }
+
+        .result {
+            margin-top: 30px;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            color: var(--text-color);
+            font-weight: 500;
+            text-align: center;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            animation: fadeIn 0.5s ease;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .result strong {
+            font-weight: bold;
+            color: var(--accent-color);
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(15px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .formula {
+            margin-top: 20px;
+            padding: 15px;
+            font-size: 17px;
+            font-weight: 400;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            text-align: center;
+            font-family: "Courier New", Courier, monospace;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            animation: fadeIn 0.5s ease;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .fraction {
+            display: inline-block;
+            text-align: center;
+            vertical-align: middle;
+        }
+        .fraction .top {
+            border-bottom: 2px solid var(--text-color);
+            display: block;
+            padding: 0 5px;
+        }
+
+        .fraction .bottom {
+            display: block;
+            padding: 0 5px;
+        }
+
+        .footer {
+            margin-top: 30px;
+            font-size: 14px;
+            color: var(--secondary-text);
+            text-align: center;
+            letter-spacing: 0.5px;
+            transition: color 0.3s ease;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.2);
+        }
+
+        .footer a {
+            text-decoration: none;
+            color: var(--accent-color);
+            font-weight: 500;
+            transition: color 0.3s ease, text-shadow 0.3s ease;
+        }
+
+        .footer a:hover {
+            color: #99d9f8;
+            text-decoration: underline;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+        }
+
+        .input-container {
+            position: relative;
+            margin-bottom: 15px;
+        }
+
+        .input-container i {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            pointer-events: none;
+            color: var(--secondary-text);
+            transition: color 0.3s ease;
+        }
+        input:focus + i,
+        input:not(:placeholder-shown) + i{
+            color: var(--text-color);
+        }
+        input {
+            padding-left: 40px;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 30px;
+            }
+            h1 {
+                font-size: 28px;
+            }
+            .sub-title {
+                font-size: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="theme-toggle-container">
+                <button class="theme-toggle" onclick="toggleTheme()">
+                    <i class="bi bi-sun-fill"></i>
+                    <i class="bi bi-moon-fill"></i>
+                </button>
+            </div>
+            <div class="logo-container">
+                <a href="https://www.facebook.com/4tankova" target="_blank">
+                    <img src="logo.png" alt="Логотип" class="logo">
+                    <div class="sub-title">
+                         4 ОТБр
+                    </div>
+                </a>
+            </div>
+        </div>
+        <h1>Розрахунок витрати палива</h1>
+        <form id="fuel-form">
+            <div class="input-container">
+                <label for="a">A (нормативна витрата палива, л/100 км):</label>
+                <input type="number" id="a" placeholder="Введіть значення A">
+                <i class="fas fa-gas-pump"></i>
+            </div>
+            <div class="input-container">
+                <label for="b">B (км з вантажем):</label>
+                <input type="number" id="b" placeholder="Введіть значення B">
+                <i class="fas fa-truck"></i>
+            </div>
+            <div class="input-container">
+                <label for="v">V (км без вантажу):</label>
+                <input type="number" id="v" placeholder="Введіть значення V">
+                <i class="fas fa-car"></i>
+            </div>
+            <div class="input-container">
+                <label for="g">G (відпрацьовано мотогодин):</label>
+                <input type="number" id="g" placeholder="Введіть значення G">
+                <i class="fas fa-stopwatch"></i>
+            </div>
+            <button type="button" onclick="calculateFuel()">Розрахувати</button>
+        </form>
+
+        <div id="result" class="result" style="display: none;"></div>
+        <div id="formula" class="formula" style="display: none;"></div>
+        <div class="footer">
+            <a href="https://www.facebook.com/profile.php?id=100001232615511" target="_blank">created by ODIN</a>
+        </div>
+    </div>
+    <script>
+        function toggleTheme() {
+            const body = document.body;
+            const currentTheme = body.getAttribute('data-theme') || 'dark';
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            body.setAttribute('data-theme', newTheme);
+            // Store theme preference in localStorage
+            localStorage.setItem('theme', newTheme);
+        }
+
+        // Retrieve theme from localStorage on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            const savedTheme = localStorage.getItem('theme');
+            if (savedTheme) {
+                document.body.setAttribute('data-theme', savedTheme);
+            }
+        });
+
+
+        function calculateFuel() {
+            const a = parseFloat(document.getElementById("a").value) || 0;
+            const b = parseFloat(document.getElementById("b").value) || 0;
+            const v = parseFloat(document.getElementById("v").value) || 0;
+            const g = parseFloat(document.getElementById("g").value) || 0;
+
+            const fuelWithLoad = Math.round((a / 100) * b * 1.2);
+            const fuelWithoutLoad = Math.round((a / 100) * v);
+            const fuelByHours = Math.round(g * 25 * (a / 100));
+            const totalFuel = fuelWithLoad + fuelWithoutLoad + fuelByHours;
+
+            let formulaHTML = "";
+
+            if (fuelWithLoad > 0) {
+                formulaHTML += `
+                    <div>
+                        <span class="fraction">
+                            <span class="top">${b} км × ${a} л</span>
+                            <span class="bottom">100</span>
+                        </span>
+                       × 1.2 = ${fuelWithLoad} л
+                   </div>
+                 `;
+            }
+
+            if (fuelWithoutLoad > 0) {
+                formulaHTML += `
+                   <div>
+                       <span class="fraction">
+                           <span class="top">${v} км × ${a} л</span>
+                           <span class="bottom">100</span>
+                       </span>
+                        = ${fuelWithoutLoad} л
+                   </div>
+               `;
+            }
+            if (fuelByHours > 0) {
+                formulaHTML += `
+                    <div>
+                       <span class="fraction">
+                            <span class="top">${g} м/г × 25 км × ${a} л</span>
+                           <span class="bottom">100</span>
+                      </span>
+                       = ${fuelByHours} л
+                   </div>
+               `;
+            }
+
+            let totalParts = [];
+            if (fuelWithLoad > 0) totalParts.push(`${fuelWithLoad} л`);
+            if (fuelWithoutLoad > 0) totalParts.push(`${fuelWithoutLoad} л`);
+            if (fuelByHours > 0) totalParts.push(`${fuelByHours} л`);
+            let totalFormula = totalParts.join(' + ');
+
+            if (totalParts.length > 1) {
+                totalFormula += ` = ${totalFuel} л`;
+            }
+            formulaHTML += `<div><strong>Всього витрачено:</strong> ${totalFormula}</div>`;
+
+
+            const resultDiv = document.getElementById("result");
+            const formulaDiv = document.getElementById("formula");
+
+            resultDiv.style.display = "block";
+            resultDiv.innerHTML = `Обсяг списаного палива: <strong>${totalFuel}</strong> л.`;
+
+            formulaDiv.style.display = "block";
+            formulaDiv.innerHTML = formulaHTML;
+        }
+    </script>
+</body>
+</html>
