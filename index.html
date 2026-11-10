@@ -3,1596 +3,225 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<meta name="theme-color" content="#0f766e">
-<title>Розрахунок витрати палива</title>
-<script>
-(function(){try{var t=localStorage.getItem('fuel_calc_theme')||(matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light');document.documentElement.setAttribute('data-theme',t);}catch(e){}})();
-</script>
+<title>Калькулятор палива переїхав</title>
+<meta name="description" content="Калькулятор витрати палива тепер за новою адресою: 4tankova.github.io/Odin">
+<meta name="robots" content="noindex, follow">
+<meta name="theme-color" content="#0b1120">
+<link rel="canonical" href="https://4tankova.github.io/Odin/">
+<noscript><meta http-equiv="refresh" content="8; url=https://4tankova.github.io/Odin/"></noscript>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
 :root{
-  --bg:#eef2f7; --bg2:#e2e8f0;
-  --surface:#ffffff; --surface-2:#f6f8fb; --border:#e2e8f0; --border-strong:#cbd5e1;
+  --bg:#eef2f7; --surface:#ffffff; --surface-2:#f6f8fb; --border:#e2e8f0;
   --text:#0f172a; --muted:#64748b; --faint:#94a3b8;
-  --primary:#2563eb; --primary-soft:#dbeafe;
-  --green:#059669; --green-soft:#d1fae5;
-  --amber:#d97706; --amber-soft:#fef3c7;
-  --rose:#e11d48; --rose-soft:#ffe4e6;
-  --indigo:#4f46e5; --indigo-soft:#e0e7ff;
-  --shadow:0 1px 2px rgba(15,23,42,.04),0 8px 24px rgba(15,23,42,.06);
-  --shadow-lg:0 20px 50px rgba(15,23,42,.14);
-  --r:22px; --gap:20px;
+  --green:#059669; --green-2:#10b981; --green-soft:#d1fae5; --primary:#2563eb;
+  --shadow:0 30px 70px rgba(15,23,42,.14),0 2px 6px rgba(15,23,42,.05);
 }
-:root[data-theme="dark"]{
-  --bg:#0b1120; --bg2:#0f172a;
-  --surface:#121a2b; --surface-2:#182236; --border:#243048; --border-strong:#334155;
-  --text:#e5e7eb; --muted:#94a3b8; --faint:#64748b;
-  --primary:#60a5fa; --primary-soft:#1e3a5f;
-  --green:#34d399; --green-soft:#0d3b30;
-  --amber:#fbbf24; --amber-soft:#3d2e0d;
-  --rose:#fb7185; --rose-soft:#43141f;
-  --indigo:#a5b4fc; --indigo-soft:#262a5a;
-  --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 24px rgba(0,0,0,.25);
-  --shadow-lg:0 20px 50px rgba(0,0,0,.5);
+@media (prefers-color-scheme: dark){
+  :root{
+    --bg:#0b1120; --surface:#121a2b; --surface-2:#182236; --border:#243048;
+    --text:#e5e7eb; --muted:#94a3b8; --faint:#64748b;
+    --green:#34d399; --green-2:#10b981; --green-soft:#0d3b30; --primary:#60a5fa;
+    --shadow:0 30px 70px rgba(0,0,0,.5);
+  }
 }
 *{box-sizing:border-box}
-html{-webkit-text-size-adjust:100%}
-body{margin:0;font-family:'Inter',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;color:var(--text);
-  background:radial-gradient(1200px 600px at 10% -10%,var(--primary-soft),transparent 60%),linear-gradient(180deg,var(--bg),var(--bg2));
-  background-attachment:fixed;min-height:100vh;line-height:1.45}
-button,input{font:inherit;color:inherit}
-button{cursor:pointer}
-a{color:inherit}
-.container{max-width:1240px;margin:0 auto;padding:clamp(14px,3vw,28px) clamp(12px,3vw,24px) 48px}
+html{height:100%}
+body{margin:0;font-family:'Inter',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;color:var(--text);background:var(--bg);
+  min-height:100%;display:flex;flex-direction:column;padding:24px 16px;overflow-x:hidden;line-height:1.45}
 
-.top{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:14px;margin-bottom:var(--gap)}
-.brand{display:flex;align-items:center;gap:14px;min-width:0}
-.logo{width:50px;height:50px;flex-shrink:0;border-radius:16px;display:grid;place-items:center;font-size:24px;
-  background:linear-gradient(135deg,#0f766e,#059669);box-shadow:0 8px 20px rgba(5,150,105,.35)}
-h1{font-size:clamp(20px,3vw,28px);margin:0;font-weight:800;letter-spacing:-.02em;line-height:1.15}
-.sub{margin:3px 0 0;color:var(--muted);font-size:14px}
-.top-actions{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
-.pill{display:inline-flex;align-items:center;gap:7px;border-radius:999px;padding:8px 14px;font-size:13px;font-weight:600;
-  text-decoration:none;border:1px solid transparent;transition:transform .15s,box-shadow .15s;white-space:nowrap;line-height:1.2}
-a.pill:hover,button.pill:hover{transform:translateY(-1px);box-shadow:var(--shadow)}
-.pill svg{width:16px;height:16px;fill:currentColor;flex-shrink:0}
-.pill-info{background:var(--primary-soft);color:var(--primary)}
-.pill-ok{background:var(--green-soft);color:var(--green)}
-.pill-bad{background:var(--rose-soft);color:var(--rose)}
-.pill-dark{background:#1e293b;color:#fff}
-.pill-dark svg{color:#34d399}
-.pill-wa{background:#25D366;color:#fff}
-.icon-btn{width:36px;height:36px;border-radius:999px;border:1px solid var(--border);background:var(--surface);display:grid;place-items:center;font-size:16px;transition:transform .2s}
-.icon-btn:hover{transform:rotate(20deg)}
-@media(max-width:560px){
-  .top{flex-direction:column;align-items:stretch}
-  .top-actions{justify-content:flex-start}
-  .pill .lbl-long{display:none}
-}
-@media(min-width:561px){.pill .lbl-short{display:none}}
+.bg{position:fixed;inset:0;z-index:-1;overflow:hidden;pointer-events:none}
+.bg span{position:absolute;border-radius:50%;filter:blur(70px);opacity:.55}
+.bg span:nth-child(1){width:520px;height:520px;background:#10b98155;top:-160px;left:-120px;animation:float 16s ease-in-out infinite}
+.bg span:nth-child(2){width:460px;height:460px;background:#3b82f644;bottom:-180px;right:-120px;animation:float 19s ease-in-out infinite reverse}
+.bg span:nth-child(3){width:300px;height:300px;background:#0f766e44;top:40%;left:60%;animation:float 23s ease-in-out infinite}
+@keyframes float{50%{transform:translate(40px,30px) scale(1.08)}}
 
-.layout{display:grid;grid-template-columns:minmax(0,1fr);gap:var(--gap);align-items:start}
-@media(min-width:1080px){.layout{grid-template-columns:minmax(0,7fr) minmax(0,5fr)}.side{position:sticky;top:16px}}
-.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);box-shadow:var(--shadow);padding:clamp(16px,3vw,28px);min-width:0}
-.stack{display:flex;flex-direction:column;gap:var(--gap);min-width:0}
-.section-title{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:0 0 14px;font-size:12px;font-weight:700;
-  text-transform:uppercase;letter-spacing:.07em;color:var(--muted);min-height:24px}
-.section + .section{margin-top:24px;padding-top:22px;border-top:1px dashed var(--border)}
-.sec-note{text-transform:none;letter-spacing:0;font-weight:500;color:var(--faint)}
-.section-title{flex-wrap:wrap;row-gap:2px}
-@media(max-width:560px){.tip{display:none}}
+.card{width:100%;max-width:520px;background:var(--surface);border:1px solid var(--border);border-radius:28px;box-shadow:var(--shadow);
+  margin:auto;padding:clamp(22px,5vw,36px);text-align:center;animation:rise .6s cubic-bezier(.2,.8,.2,1) both}
+@keyframes rise{from{opacity:0;transform:translateY(18px) scale(.98)}}
 
-.grid2{display:grid;grid-template-columns:minmax(0,1fr);gap:14px}
-@media(min-width:520px){.grid2{grid-template-columns:repeat(2,minmax(0,1fr))}}
-.field{display:block;min-width:0}
-.label{display:block;font-size:14px;font-weight:600;margin-bottom:6px}
-.input-wrap{position:relative;display:flex;align-items:center;min-width:0;background:var(--surface-2);border:1.5px solid var(--border);border-radius:16px;
-  transition:border-color .15s,box-shadow .15s,background .15s}
-.input-wrap:focus-within{border-color:var(--primary);box-shadow:0 0 0 4px color-mix(in srgb,var(--primary) 18%,transparent);background:var(--surface)}
-.input-wrap input{flex:1 1 auto;width:100%;min-width:0;border:0;background:transparent;outline:none;padding:13px 14px;font-size:20px;font-weight:600;font-variant-numeric:tabular-nums}
-.input-wrap.big input{font-size:clamp(22px,4vw,28px);padding:15px 16px;font-weight:700}
-.unit{flex-shrink:0;padding-right:14px;color:var(--faint);font-size:13px;font-weight:600;white-space:nowrap;pointer-events:none}
-.input-wrap.text input{font-size:16px;font-weight:500}
-.eq{flex-shrink:0;margin-right:8px;font-size:12px;font-weight:700;color:var(--primary);background:var(--primary-soft);padding:3px 7px;border-radius:8px;white-space:nowrap}
-.hint{font-size:12px;color:var(--muted);margin-top:6px;min-height:17px}
+.logo{width:64px;height:64px;margin:0 auto 14px;border-radius:22px;display:grid;place-items:center;font-size:36px;
+  background:linear-gradient(135deg,#0f766e,#059669);box-shadow:0 12px 28px rgba(5,150,105,.4);position:relative}
+.logo::after{content:'';position:absolute;inset:-6px;border-radius:26px;border:2px solid #10b98155;animation:pulse 2.4s ease-out infinite}
+@keyframes pulse{from{transform:scale(.9);opacity:1}to{transform:scale(1.25);opacity:0}}
 
-.chips{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px}
-.chip{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--border);background:var(--surface-2);border-radius:999px;
-  padding:5px 5px 5px 12px;font-size:13px;font-weight:600;transition:all .15s;cursor:pointer;max-width:100%}
-.chip:hover{border-color:var(--primary)}
-.chip.active{background:var(--primary);color:#fff;border-color:var(--primary)}
-.chip .chip-name{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.chip .chip-rate{opacity:.7;font-weight:500}
-.chip .x{width:22px;height:22px;border-radius:999px;border:0;background:transparent;display:grid;place-items:center;font-size:14px;opacity:.6;color:inherit}
-.chip .x:hover{opacity:1;background:rgba(0,0,0,.1)}
-.chip-add{border-style:dashed;padding:6px 12px;color:var(--muted);background:transparent}
-.veh-form{display:none;gap:8px;margin-bottom:14px}
-.veh-form.show{display:flex}
-.veh-form input{flex:1;min-width:0;border:1.5px solid var(--border);background:var(--surface-2);border-radius:12px;padding:10px 12px;outline:none}
-.veh-form input:focus{border-color:var(--primary)}
+.tag{display:inline-block;font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--green);
+  background:var(--green-soft);padding:5px 12px;border-radius:999px;margin-bottom:12px}
+h1{font-size:clamp(24px,5vw,32px);font-weight:800;letter-spacing:-.02em;margin:0 0 8px;line-height:1.15}
+.lead{color:var(--muted);font-size:16px;margin:0 auto 20px;max-width:400px}
 
-.seg{display:inline-flex;background:var(--surface);border:1px solid var(--border);border-radius:999px;padding:3px;gap:2px;flex-shrink:0}
-.seg label{position:relative;display:block}
-.seg input{position:absolute;opacity:0;pointer-events:none}
-.seg span{display:block;padding:4px 11px;border-radius:999px;font-size:12px;font-weight:700;color:var(--muted);cursor:pointer;white-space:nowrap;transition:background .15s,color .15s}
-.seg label:hover span{color:var(--text)}
-.seg input:checked+span{background:var(--c,var(--primary));color:#fff}
-.seg input:focus-visible+span{outline:2px solid var(--primary);outline-offset:1px}
-.fuel-row{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:14px;padding:10px 12px 10px 16px;border:1px solid var(--border);border-radius:16px;background:var(--surface-2)}
-.fuel-row .label{margin:0}
-.fuel-row .seg{--c:var(--primary)}
-.fuel-row .seg span{font-size:13px;padding:7px 14px}
-.fuel-row .seg small{font-weight:600;opacity:.75;margin-left:4px}
-@media(max-width:420px){.fuel-row{flex-direction:column;align-items:stretch}.fuel-row .seg{display:grid;grid-template-columns:1fr 1fr}.fuel-row .seg span{text-align:center}}
+.move{display:grid;gap:6px;margin-bottom:20px;text-align:left}
+.addr{display:flex;align-items:center;gap:12px;padding:12px 14px;border-radius:16px;border:1px solid var(--border);background:var(--surface-2);min-width:0}
+.addr small{display:block;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--faint)}
+.addr .u{font-weight:600;font-size:14px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.addr .ic{flex-shrink:0;width:32px;height:32px;border-radius:10px;display:grid;place-items:center;font-size:15px;background:var(--border)}
+.addr.old .u{color:var(--faint);text-decoration:line-through;text-decoration-thickness:1.5px}
+.addr.new{border-color:var(--green);background:var(--green-soft)}
+.addr.new .u{color:var(--green);white-space:normal;overflow-wrap:anywhere}
+.addr.new .ic{background:var(--green);color:#fff}
+.addr>div:not(.ic){min-width:0;flex:1}
+.arrow{justify-self:center;color:var(--faint);font-size:18px;line-height:1;animation:nudge 1.4s ease-in-out infinite}
+@keyframes nudge{50%{transform:translateY(4px)}}
+.copy{flex-shrink:0;border:0;background:transparent;font-size:18px;cursor:pointer;width:38px;height:38px;border-radius:10px}
+.copy:hover{background:rgba(5,150,105,.12)}
 
-.roads{display:flex;flex-direction:column;gap:12px}
-.road{border-radius:18px;padding:14px 14px 14px 20px;border:1px solid var(--border);background:var(--surface-2);position:relative;overflow:hidden}
-.road::before{content:'';position:absolute;left:0;top:0;bottom:0;width:5px;background:var(--c)}
-.road-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:10px}
-.road-name{font-weight:700;font-size:16px}
-.badge{font-size:12px;font-weight:700;padding:3px 9px;border-radius:999px;background:var(--cs);color:var(--c);white-space:nowrap}
-.road .grid2{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
-.road .input-wrap{background:var(--surface)}
-.road .label{font-size:12px;color:var(--muted);font-weight:600;margin-bottom:4px}
-.road-zam{--c:var(--green);--cs:var(--green-soft)}
-.road-city{--c:var(--amber);--cs:var(--amber-soft)}
-.road-low{--c:var(--rose);--cs:var(--rose-soft)}
+.count{position:relative;width:88px;height:88px;margin:0 auto 18px}
+.count svg{width:100%;height:100%;transform:rotate(-90deg)}
+.count circle{fill:none;stroke-width:7}
+.count .track{stroke:var(--border)}
+.count .bar{stroke:url(#g);stroke-linecap:round;transition:stroke-dashoffset .2s linear}
+.count .num{position:absolute;inset:0;display:grid;place-items:center;font-size:34px;font-weight:800;font-variant-numeric:tabular-nums}
+.count .num small{display:block;font-size:11px;font-weight:600;color:var(--muted);margin-top:-6px}
+.count.paused .bar{stroke:var(--faint)}
 
-.switch{display:flex;align-items:center;gap:14px;cursor:pointer;padding:14px 16px;border:1px solid var(--border);border-radius:16px;background:var(--surface-2);height:100%;min-width:0}
-.switch input{appearance:none;-webkit-appearance:none;width:46px;height:28px;border-radius:999px;background:var(--border-strong);position:relative;flex-shrink:0;transition:background .2s;cursor:pointer;margin:0}
-.switch input::after{content:'';position:absolute;top:3px;left:3px;width:22px;height:22px;border-radius:50%;background:#fff;transition:transform .2s;box-shadow:0 1px 3px rgba(0,0,0,.25)}
-.switch input:checked{background:var(--primary)}
-.switch input:checked::after{transform:translateX(18px)}
-.switch b{display:block;font-size:15px}
-.switch small{color:var(--muted);font-size:12px}
+.btn{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;border-radius:16px;padding:16px 20px;font:inherit;font-size:17px;font-weight:700;
+  text-decoration:none;border:0;cursor:pointer;transition:transform .15s,box-shadow .15s}
+.btn-main{color:#fff;background:linear-gradient(135deg,#047857,#059669 55%,#10b981);box-shadow:0 12px 26px rgba(5,150,105,.35)}
+.btn-main:hover{transform:translateY(-2px);box-shadow:0 16px 32px rgba(5,150,105,.45)}
+.btn-main span{transition:transform .2s}
+.btn-main:hover span{transform:translateX(4px)}
+.row{display:flex;gap:10px;justify-content:center;margin-top:14px;flex-wrap:wrap}
+.link{border:0;background:none;font:inherit;font-size:14px;font-weight:600;color:var(--muted);cursor:pointer;padding:6px 10px;border-radius:10px}
+.link:hover{color:var(--text);background:var(--surface-2)}
 
-.balance-line{margin-top:12px;display:flex;align-items:center;justify-content:space-between;gap:10px;padding:12px 16px;border-radius:14px;background:var(--surface-2);border:1px solid var(--border);font-size:14px}
-.balance-line b{white-space:nowrap;font-size:18px;font-variant-numeric:tabular-nums}
-.balance-line.neg{background:var(--rose-soft);border-color:transparent;color:var(--rose)}
+.note{margin-top:18px;padding:14px 16px;border-radius:16px;background:var(--surface-2);border:1px solid var(--border);text-align:left;font-size:14px;color:var(--muted)}
+.note b{color:var(--text)}
+.note ul{margin:6px 0 0;padding-left:18px}
+.note li{margin:3px 0}
 
-.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border-radius:14px;padding:11px 16px;font-weight:600;font-size:14px;
-  border:1px solid var(--border);background:var(--surface);transition:all .15s;text-decoration:none;line-height:1.2}
-.btn:hover{border-color:var(--primary);transform:translateY(-1px)}
-.btn:active{transform:translateY(0)}
-.btn-primary{background:var(--primary);color:#fff;border-color:var(--primary)}
-.btn-green{background:#059669;color:#fff;border-color:#059669}
-.btn-ghost{background:transparent}
-.btn-sm{padding:7px 12px;font-size:13px;border-radius:11px}
-.form-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:22px}
-.tip{font-size:12px;color:var(--muted);align-self:center}
-.tip kbd{font-family:inherit;font-weight:700;background:var(--surface-2);border:1px solid var(--border);border-radius:6px;padding:1px 6px}
-
-.result{border-radius:var(--r);padding:clamp(18px,3vw,26px);color:#fff;position:relative;overflow:hidden;
-  background:radial-gradient(500px 220px at 100% 0%,rgba(52,211,153,.35),transparent 60%),linear-gradient(145deg,#064e3b,#047857 55%,#059669);
-  box-shadow:var(--shadow-lg)}
-.result::after{content:'⛽';position:absolute;right:-6px;bottom:-26px;font-size:150px;opacity:.07;pointer-events:none}
-.r-label{font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:#a7f3d0;font-weight:700}
-.r-main{display:flex;align-items:baseline;gap:10px;margin-top:4px}
-.r-fuel{font-size:clamp(56px,10vw,84px);font-weight:800;line-height:1;letter-spacing:-.04em;font-variant-numeric:tabular-nums}
-.r-unit{font-size:22px;color:#d1fae5;font-weight:600}
-.bump{animation:bump .35s ease}
-@keyframes bump{40%{transform:scale(1.06)}}
-.r-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:16px;position:relative;z-index:1}
-.stat{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.14);border-radius:16px;padding:11px 14px;min-width:0}
-.stat.wide{grid-column:1/-1}
-.stat.blue{background:rgba(59,130,246,.24);border-color:rgba(147,197,253,.38)}
-.stat.blue .stat-k{color:#bfdbfe}
-.stat.blue .stat-v{color:#dbeafe}
-.stat.off{opacity:.45}
-.stat.warn{background:rgba(244,63,94,.28);border-color:rgba(253,164,175,.45)}
-.stat-row{display:flex;justify-content:space-between;align-items:baseline;gap:10px}
-.stat-k{font-size:11px;color:#a7f3d0;font-weight:700;text-transform:uppercase;letter-spacing:.05em}
-.stat-v{font-size:clamp(18px,2.6vw,22px);font-weight:700;margin-top:2px;font-variant-numeric:tabular-nums;white-space:nowrap}
-.stat-n{font-size:11px;color:rgba(209,250,229,.75);margin-top:2px}
-.result-actions{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
-.result-actions .btn{flex-direction:column;gap:4px;padding:11px 4px;font-size:12px}
-.result-actions .btn span:first-child{font-size:18px}
-
-.lock{text-align:center;border-radius:var(--r);padding:30px 22px;background:linear-gradient(160deg,#0f172a,#1e1b2e);color:#fff;border:1px solid rgba(244,63,94,.35);box-shadow:var(--shadow-lg)}
-.lock h2{color:#fb7185;margin:8px 0 6px;font-size:21px}
-.lock p{color:#cbd5e1;font-size:14px;margin:0 0 18px}
-
-details.card{padding:0}
-details.card>summary{list-style:none;cursor:pointer;display:flex;align-items:center;gap:10px;font-weight:700;font-size:16px;padding:16px clamp(16px,3vw,24px);border-radius:var(--r)}
-details.card>summary::-webkit-details-marker{display:none}
-details.card>summary .sum-title{flex:1;min-width:0}
-details.card>summary .chev{transition:transform .2s;color:var(--muted);font-size:14px}
-details[open].card>summary .chev{transform:rotate(180deg)}
-details.card>.d-body{padding:0 clamp(16px,3vw,24px) clamp(16px,3vw,24px)}
-.state{font-size:12px;font-weight:700;padding:4px 10px;border-radius:999px;white-space:nowrap}
-
-.formula{display:flex;flex-direction:column;gap:8px;font-size:14px}
-.f-group{font-weight:700;font-size:13px;margin-top:8px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em}
-.f-box{border-radius:12px;padding:10px 14px;border:1px solid var(--border);background:var(--surface-2)}
-.f-box .t{font-weight:600;margin-bottom:2px}
-.f-box .calc{color:var(--muted);font-variant-numeric:tabular-nums}
-.f-box .calc b{color:var(--text)}
-.f-green{background:var(--green-soft);border-color:transparent}
-.f-amber{background:var(--amber-soft);border-color:transparent}
-.f-indigo{background:var(--indigo-soft);border-color:transparent}
-.f-row{display:flex;justify-content:space-between;gap:10px}
-.f-total{display:flex;justify-content:space-between;align-items:center;font-size:19px;font-weight:800;padding-top:12px;margin-top:4px;border-top:1px solid var(--border)}
-.f-total span:last-child{color:var(--green)}
-.f-blue{color:var(--primary);font-weight:600}
-
-.hsum{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-bottom:12px}
-.hsum div{background:var(--surface-2);border:1px solid var(--border);border-radius:12px;padding:8px 10px;min-width:0}
-.hsum small{display:block;font-size:11px;color:var(--muted);font-weight:600}
-.hsum b{font-size:16px;font-variant-numeric:tabular-nums;white-space:nowrap}
-.hsum-title{font-size:12px;color:var(--muted);margin-bottom:6px;font-weight:600}
-.hist{display:flex;flex-direction:column;gap:8px;max-height:320px;overflow:auto}
-.h-item{display:flex;align-items:center;gap:10px;padding:9px 10px 9px 12px;border:1px solid var(--border);border-radius:14px;background:var(--surface-2);cursor:pointer;transition:border-color .15s}
-.h-item:hover{border-color:var(--primary)}
-.h-main{flex:1;min-width:0}
-.h-note{font-weight:600;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.h-meta{font-size:12px;color:var(--muted)}
-.h-fuel{font-weight:800;font-size:17px;color:var(--green);white-space:nowrap;font-variant-numeric:tabular-nums}
-.h-del{border:0;background:transparent;color:var(--faint);font-size:18px;width:28px;height:28px;border-radius:8px;flex-shrink:0}
-.h-del:hover{color:var(--rose);background:var(--rose-soft)}
-.empty{color:var(--muted);font-size:14px;text-align:center;padding:14px;border:1px dashed var(--border);border-radius:14px}
-.h-tools{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap}
-
-.step{margin-bottom:18px}
-.step-k{font-size:11px;font-weight:800;color:var(--primary);text-transform:uppercase;letter-spacing:.07em;display:block;margin-bottom:8px}
-.pay{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
-.btn-mono{background:#00A3FF;color:#fff;border-color:#00A3FF}
-.btn-privat{background:#1d9e3e;color:#fff;border-color:#1d9e3e}
-.devbox{display:flex;align-items:center;justify-content:space-between;gap:12px;background:var(--surface-2);border:1px solid var(--border);border-radius:14px;padding:10px 12px}
-.devbox .k{font-size:10px;color:var(--faint);text-transform:uppercase;letter-spacing:.08em}
-.devbox .v{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:19px;font-weight:700}
-.keyrow{display:flex;gap:8px}
-.keyrow input{flex:1;min-width:0;text-align:center;font-family:ui-monospace,monospace;text-transform:uppercase;border:1.5px solid var(--border);background:var(--surface-2);border-radius:14px;padding:11px;outline:none}
-.keyrow input:focus{border-color:var(--primary)}
-.err{color:var(--rose);font-size:12px;margin:6px 0 0}
-.req{margin-top:10px}
-.req-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-bottom:8px}
-@media(max-width:420px){.req-grid{grid-template-columns:minmax(0,1fr)}}
-.inp{width:100%;min-width:0;border:1.5px solid var(--border);background:var(--surface-2);border-radius:12px;padding:10px 12px;outline:none}
-.inp:focus{border-color:var(--primary)}
-.btn-dark{width:100%;margin-top:10px;background:#1e293b;color:#fff;border-color:#1e293b}
-.req .btn-dark{margin-top:0}
-.btn-link{background:none!important;border:0!important;color:var(--muted)!important;padding:4px!important;margin-top:6px!important;font-size:12px;font-weight:600;text-decoration:underline}
-.ok-note{margin-top:10px;padding:10px 12px;border-radius:12px;background:var(--green-soft);color:var(--green);font-size:13px;font-weight:600}
-.btn:disabled{opacity:.6;cursor:wait;transform:none}
-
-.hidden{display:none!important}
-
-.mbar{position:fixed;left:12px;right:12px;bottom:calc(12px + env(safe-area-inset-bottom));z-index:40;display:flex;align-items:center;justify-content:space-between;gap:12px;
-  padding:10px 16px;border-radius:18px;color:#fff;background:linear-gradient(135deg,#065f46,#059669);box-shadow:0 12px 30px rgba(5,80,60,.45);
-  border:0;text-align:left;transform:translateY(160%);transition:transform .25s ease}
-.mbar.show{transform:none}
-.mbar small{display:block;font-size:10px;letter-spacing:.07em;text-transform:uppercase;color:#a7f3d0;font-weight:700}
-.mbar b{font-size:24px;font-weight:800;font-variant-numeric:tabular-nums}
-.mbar .mb-side{text-align:right;font-size:13px;color:#d1fae5;font-variant-numeric:tabular-nums}
-@media(min-width:1080px){.mbar{display:none}}
-
-.toast{position:fixed;left:50%;bottom:calc(24px + env(safe-area-inset-bottom));transform:translate(-50%,20px);background:#0f172a;color:#fff;padding:12px 18px;border-radius:14px;
-  font-size:14px;font-weight:600;box-shadow:var(--shadow-lg);opacity:0;pointer-events:none;transition:all .25s;z-index:60;max-width:calc(100% - 32px);text-align:center}
+.toast{position:fixed;left:50%;bottom:24px;transform:translate(-50%,20px);background:#0f172a;color:#fff;padding:12px 18px;border-radius:14px;
+  font-size:14px;font-weight:600;opacity:0;transition:all .25s;pointer-events:none}
 .toast.show{opacity:1;transform:translate(-50%,0)}
-@media(max-width:1079px){.toast{bottom:calc(92px + env(safe-area-inset-bottom))}}
 
-footer{text-align:center;color:var(--faint);font-size:12px;margin-top:26px}
-@media(max-width:1079px){footer{margin-bottom:70px}}
-
-#print-report{display:none}
-@media print{
-  @page{size:A4 portrait;margin:12mm 12mm 14mm}
-  html,body{background:#fff!important}
-  body>*:not(#print-report){display:none!important}
-  #print-report{display:block;color:#000;font:9.5pt/1.35 'Inter',Arial,sans-serif;-webkit-print-color-adjust:exact;print-color-adjust:exact}
-  .pr-head{display:flex;justify-content:space-between;align-items:flex-end;gap:12px;border-bottom:1.5pt solid #000;padding-bottom:6px;margin-bottom:10px}
-  .pr-head h2{margin:0;font-size:14pt;letter-spacing:.02em}
-  .pr-head .meta{font-size:9pt;text-align:right}
-  .pr-info{display:grid;grid-template-columns:1fr 1fr;gap:2px 16px;margin-bottom:10px;font-size:9.5pt}
-  .pr-info span{color:#444}
-  .pr-h{font-size:9pt;font-weight:700;text-transform:uppercase;letter-spacing:.05em;margin:12px 0 4px}
-  table.pr{width:100%;border-collapse:collapse;page-break-inside:avoid}
-  table.pr th,table.pr td{border:.6pt solid #666;padding:3.5px 6px;vertical-align:top}
-  table.pr th{background:#ececec;font-weight:700;font-size:8.5pt;text-align:left}
-  table.pr .n{text-align:right;white-space:nowrap;font-variant-numeric:tabular-nums}
-  table.pr .c{text-align:center}
-  table.pr tr.pr-sub td{background:#f5f5f5;font-weight:700}
-  table.pr tr.grand td{background:#e3f4ec;font-weight:800;font-size:11pt}
-  table.pr tr.ad td{background:#e6eefc;font-weight:700}
-  .pr-cols{display:grid;grid-template-columns:1.35fr 1fr;gap:14px;align-items:start}
-  .pr-sign{display:grid;grid-template-columns:1fr 1fr;gap:28px;margin-top:26px;font-size:9pt}
-  .pr-sign b{display:block;color:#000}
-  .pr-sign span{display:block;border-top:.7pt solid #000;margin-top:26px;padding-top:3px;color:#444;font-size:8pt}
-  .pr-foot{margin-top:14px;font-size:7.5pt;color:#666;text-align:right}
-}
+@media (prefers-reduced-motion: reduce){*{animation:none!important;transition:none!important}}
 </style>
 </head>
 <body>
-<div class="container">
+<div class="bg" aria-hidden="true"><span></span><span></span><span></span></div>
 
-  <header class="top">
-    <div class="brand">
-      <div class="logo">⛽</div>
-      <div>
-        <h1>Розрахунок витрати палива</h1>
-        <p class="sub">Пальне до списання за маршрутом</p>
-      </div>
+<main class="card">
+  <div class="logo" aria-hidden="true">⛽</div>
+  <div class="tag">Нова адреса</div>
+  <h1>Калькулятор палива переїхав</h1>
+  <p class="lead">Тепер усе в одному місці — завжди найновіша версія калькулятора та додатка.</p>
+
+  <div class="move">
+    <div class="addr old">
+      <div class="ic" aria-hidden="true">🔗</div>
+      <div><small>Стара адреса</small><div class="u" id="old-url">ця сторінка</div></div>
     </div>
-    <div class="top-actions">
-      <button type="button" id="trial-badge" class="pill pill-info">Перевірка ліцензії…</button>
-      <a href="fuel.apk" download class="pill pill-dark">
-        <svg viewBox="0 0 24 24"><path d="M17.523 15.3l1.47 2.54a.75.75 0 1 1-1.3.75l-1.48-2.56a11.455 11.455 0 0 1-8.426 0l-1.48 2.56a.75.75 0 1 1-1.3-.75l1.47-2.54A11.417 11.417 0 0 1 2.25 7.42h19.5a11.417 11.417 0 0 1-4.227 7.88zM7 10.25a.75.75 0 1 0 0-1.5.75.75 0 0 0 0 1.5zm10 0a.75.75 0 1 0 0-1.5.75.75 0 0 0 0 1.5z"/></svg>
-        <span class="lbl-long">Завантажити додаток</span><span class="lbl-short">Додаток</span>
-      </a>
-      <a href="https://wa.me/380954240074" target="_blank" rel="noopener noreferrer" class="pill pill-wa">
-        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.435 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413z"/></svg>
-        Техпідтримка
-      </a>
-      <button id="theme-btn" class="icon-btn" type="button" title="Світла / темна тема" aria-label="Змінити тему">🌓</button>
+    <div class="arrow" aria-hidden="true">↓</div>
+    <div class="addr new">
+      <div class="ic" aria-hidden="true">✓</div>
+      <div><small>Нова адреса</small><div class="u">4tankova.github.io/Odin</div></div>
+      <button class="copy" id="copy" type="button" title="Копіювати адресу" aria-label="Копіювати адресу">📋</button>
     </div>
-  </header>
-
-  <div class="layout">
-    <main class="card form-col">
-
-      <div class="section">
-        <div class="section-title">Транспорт і вантаж</div>
-        <div class="chips" id="vehicle-chips"></div>
-        <div class="veh-form" id="veh-form">
-          <input type="text" id="veh-name" placeholder="Назва авто (напр. КрАЗ-6322)" maxlength="40" autocomplete="off">
-          <button type="button" class="btn btn-sm btn-primary" id="veh-save">Зберегти</button>
-          <button type="button" class="btn btn-sm btn-ghost" id="veh-cancel" aria-label="Скасувати">✕</button>
-        </div>
-        <div class="fuel-row">
-          <span class="label">Тип пального</span>
-          <div class="seg" role="radiogroup" aria-label="Тип пального">
-            <label><input type="radio" name="fuel_type" value="diesel" checked><span>Дизель<small>+1,3 л/т</small></span></label>
-            <label><input type="radio" name="fuel_type" value="petrol"><span>Бензин<small>+2,0 л/т</small></span></label>
-          </div>
-        </div>
-        <div class="grid2">
-          <label class="field">
-            <span class="label">Базова витрата</span>
-            <div class="input-wrap big"><input class="num" id="base_rate" inputmode="decimal" autocomplete="off" value="0"><span class="unit">л/100 км</span></div>
-            <div class="hint">Норма для авто без вантажу</div>
-          </label>
-          <label class="field">
-            <span class="label">Тоннаж вантажу</span>
-            <div class="input-wrap big"><input class="num" id="tons" inputmode="decimal" autocomplete="off" value="0"><span class="unit">т</span></div>
-            <div class="hint" id="tons-hint">+1,3 л/100 км на кожну тонну (дизель)</div>
-          </label>
-        </div>
-      </div>
-
-      <div class="section">
-        <div class="section-title">Пробіг за типом дороги <span class="sec-note">можна писати 12+30+8</span></div>
-        <div class="roads">
-          <div class="road road-zam">
-            <div class="road-head"><span class="road-name">Заміські дороги</span><span class="badge">−15%</span></div>
-            <div class="grid2">
-              <label class="field"><span class="label">З вантажем</span><div class="input-wrap"><input class="num" id="zam_load" inputmode="decimal" autocomplete="off" value="0"><span class="unit">км</span></div></label>
-              <label class="field"><span class="label">Без вантажу</span><div class="input-wrap"><input class="num" id="zam_no" inputmode="decimal" autocomplete="off" value="0"><span class="unit">км</span></div></label>
-            </div>
-          </div>
-          <div class="road road-city">
-            <div class="road-head"><span class="road-name">Рух в місті</span>
-              <div class="seg" role="radiogroup" aria-label="Надбавка за рух у місті">
-                <label><input type="radio" name="city_pct" value="5"><span>+5%</span></label>
-                <label><input type="radio" name="city_pct" value="10" checked><span>+10%</span></label>
-                <label><input type="radio" name="city_pct" value="15"><span>+15%</span></label>
-              </div></div>
-            <div class="grid2">
-              <label class="field"><span class="label">З вантажем</span><div class="input-wrap"><input class="num" id="city_load" inputmode="decimal" autocomplete="off" value="0"><span class="unit">км</span></div></label>
-              <label class="field"><span class="label">Без вантажу</span><div class="input-wrap"><input class="num" id="city_no" inputmode="decimal" autocomplete="off" value="0"><span class="unit">км</span></div></label>
-            </div>
-          </div>
-          <div class="road road-low">
-            <div class="road-head"><span class="road-name">Понижені передачі</span><span class="badge">+10%</span></div>
-            <div class="grid2">
-              <label class="field"><span class="label">З вантажем</span><div class="input-wrap"><input class="num" id="low_load" inputmode="decimal" autocomplete="off" value="0"><span class="unit">км</span></div></label>
-              <label class="field"><span class="label">Без вантажу</span><div class="input-wrap"><input class="num" id="low_no" inputmode="decimal" autocomplete="off" value="0"><span class="unit">км</span></div></label>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div class="section">
-        <div class="section-title">Додатково</div>
-        <div class="grid2">
-          <label class="field">
-            <span class="label">Мотогодини</span>
-            <div class="input-wrap"><input class="num" id="hours" inputmode="decimal" autocomplete="off" value="0"><span class="unit">м/г</span></div>
-            <div class="hint">1 м/г = 25 км за базовою витратою</div>
-          </label>
-          <label class="field">
-            <span class="label">Примітка</span>
-            <div class="input-wrap text"><input id="note" type="text" maxlength="80" autocomplete="off" placeholder="Маршрут, № путівки…"></div>
-            <div class="hint">Потрапляє в історію та звіт</div>
-          </label>
-        </div>
-        <div class="grid2" style="margin-top:14px">
-          <label class="switch">
-            <input type="checkbox" id="ac" checked>
-            <span><b>Кондиціонер</b><small>+4% від округленої витрати</small></span>
-          </label>
-          <label class="switch">
-            <input type="checkbox" id="adblue_enabled" checked>
-            <span><b>ADBLUE</b><small>4% від витрати, окремо від палива</small></span>
-          </label>
-        </div>
-      </div>
-
-      <div class="section">
-        <div class="section-title">Баланс пального <span class="sec-note">необов'язково</span></div>
-        <div class="grid2">
-          <label class="field">
-            <span class="label">Залишок на початок</span>
-            <div class="input-wrap"><input class="num" id="fuel_start" inputmode="decimal" autocomplete="off" value="0"><span class="unit">л</span></div>
-          </label>
-          <label class="field">
-            <span class="label">Заправлено</span>
-            <div class="input-wrap"><input class="num" id="fuel_added" inputmode="decimal" autocomplete="off" value="0"><span class="unit">л</span></div>
-          </label>
-        </div>
-        <div class="balance-line hidden" id="balance-line"><span id="balance-text">Залишок на кінець</span><b id="balance-val">0 л</b></div>
-      </div>
-
-      <div class="form-actions">
-        <button type="button" class="btn" id="reset-btn">↺ Очистити поля</button>
-        <span class="tip"><kbd>Enter</kbd> — наступне поле</span>
-      </div>
-    </main>
-
-       <aside class="side stack">
-
-      <div id="paywall-lock-screen" class="lock hidden">
-        <div style="font-size:48px">🔒</div>
-        <h2 id="lock-title">Доступ заблоковано</h2>
-        <p id="lock-text">Безкоштовні сесії закінчились. Активуйте пристрій, щоб продовжити.</p>
-        <button type="button" class="btn btn-green" id="go-activate">Перейти до активації</button>
-      </div>
-
-      <div id="result-wrap" class="stack hidden">
-        <section id="result" class="result">
-          <div class="r-label">Паливо до списання</div>
-          <div class="r-main"><span id="total-fuel" class="r-fuel">0</span><span class="r-unit">л</span></div>
-          <div class="r-grid">
-            <div class="stat wide blue" id="adblue-box">
-              <div class="stat-row"><div><div class="stat-k">ADBLUE</div><div class="stat-n" style="color:#bfdbfe">окремо від палива</div></div><div class="stat-v" id="adblue-top">0,0 л</div></div>
-            </div>
-            <div class="stat wide"><div class="stat-k">Пройдено всього</div><div class="stat-v" id="total-km">0,0 км</div></div>
-            <div class="stat"><div class="stat-k">З вантажем</div><div class="stat-v" id="total-km-load">0,0 км</div></div>
-            <div class="stat"><div class="stat-k">Без вантажу</div><div class="stat-v" id="total-km-no">0,0 км</div></div>
-            <div class="stat wide"><div class="stat-k">Фактична витрата</div><div class="stat-v" id="actual-consumption">0,0 л/100 км</div><div class="stat-n">без урахування ADBLUE</div></div>
-            <div class="stat wide hidden" id="tank-box"><div class="stat-row"><div class="stat-k" id="tank-k">Залишок у баку</div><div class="stat-v" id="tank-v">0 л</div></div></div>
-          </div>
-        </section>
-
-        <div class="result-actions">
-          <button type="button" class="btn" id="copy-btn"><span>📋</span><span>Копіювати</span></button>
-          <button type="button" class="btn" id="share-btn"><span>📤</span><span>Поділитися</span></button>
-          <button type="button" class="btn" id="save-btn"><span>💾</span><span>Зберегти</span></button>
-          <button type="button" class="btn" id="print-btn"><span>🖨️</span><span>Друк / PDF</span></button>
-        </div>
-
-        <details class="card" id="formula-card">
-          <summary><span class="sum-title">Детальний розрахунок</span><span class="chev">▼</span></summary>
-          <div class="d-body"><div id="formula" class="formula"></div></div>
-        </details>
-      </div>
-
-      <details class="card" id="history-card">
-        <summary><span class="sum-title">Історія розрахунків</span><span class="state pill-info" id="hist-count">0</span><span class="chev">▼</span></summary>
-        <div class="d-body">
-          <div id="hist-summary"></div>
-          <div id="history" class="hist"></div>
-          <div class="h-tools" id="hist-tools">
-            <button type="button" class="btn btn-sm" id="hist-csv">⬇️ Експорт в Excel (CSV)</button>
-            <button type="button" class="btn btn-sm btn-ghost" id="hist-clear">🗑 Очистити</button>
-          </div>
-        </div>
-      </details>
-
-      <details class="card" id="activation-card">
-        <summary><span class="sum-title">🔑 Активація пристрою</span><span class="state pill-info" id="lic-state">Пробний режим</span><span class="chev">▼</span></summary>
-        <div class="d-body">
-          <div class="step">
-            <span class="step-k">Крок 1. Сплатіть ліцензію</span>
-            <div class="pay">
-              <a href="https://send.monobank.ua/jar/3ai8tzaQyj" target="_blank" rel="noopener noreferrer" class="btn btn-mono">💳 Монобанк</a>
-              <a href="https://www.privat24.ua/send/jk3ag" target="_blank" rel="noopener noreferrer" class="btn btn-privat">Приват24</a>
-            </div>
-          </div>
-          <div class="step">
-            <span class="step-k">Крок 2. Надішліть запит</span>
-            <div class="devbox">
-              <div><div class="k">Код вашого пристрою</div><div id="device-id-text" class="v">------</div></div>
-              <button type="button" class="btn btn-sm" id="copy-dev">📋 Копіювати</button>
-            </div>
-            <div id="req-form" class="req hidden">
-              <div class="req-grid">
-                <input type="text" id="req-name" class="inp" maxlength="60" autocomplete="name" placeholder="Ім’я / позивний">
-                <input type="text" id="req-contact" class="inp" maxlength="60" autocomplete="tel" placeholder="Телефон">
-              </div>
-              <button type="button" class="btn btn-dark" id="req-btn">📨 Надіслати запит на активацію</button>
-              <p class="hint">Після підтвердження оплати ліцензія увімкнеться сама — достатньо відкрити калькулятор з інтернетом.</p>
-            </div>
-            <div id="req-done" class="ok-note hidden">✅ Запит надіслано. Ліцензія увімкнеться автоматично після підтвердження оплати.</div>
-            <a id="email-btn" href="mailto:renegatduk@gmail.com" class="btn btn-dark">✉️ Надіслати код розробнику</a>
-          </div>
-          <div class="step" style="margin-bottom:0">
-            <span class="step-k">Крок 3. Маєте ключ? Введіть його</span>
-            <div class="keyrow">
-              <input type="text" id="activation-key" placeholder="FC-XXXX-XXXX-XXXX" autocomplete="off" spellcheck="false">
-              <button type="button" class="btn btn-green" id="activate-btn">Активувати</button>
-            </div>
-            <p id="act-error" class="err hidden">❌ Невірний ключ активації для цього пристрою</p>
-            <p class="hint">Перевстановили додаток чи змінили телефон? Введіть свій ключ — ліцензія відновиться.</p>
-          </div>
-        </div>
-      </details>
-    </aside>
   </div>
 
-  <footer><span id="foot-lic"></span>Розрахунки зберігаються лише на цьому пристрої. Для перевірки ліцензії передається код і модель пристрою.</footer>
-</div>
+  <div class="count" id="count" role="timer" aria-live="polite">
+    <svg viewBox="0 0 100 100" aria-hidden="true">
+      <defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#10b981"/><stop offset="1" stop-color="#047857"/></linearGradient></defs>
+      <circle class="track" cx="50" cy="50" r="44"/>
+      <circle class="bar" id="bar" cx="50" cy="50" r="44"/>
+    </svg>
+    <div class="num"><div><span id="sec">5</span><small id="sec-label">секунд</small></div></div>
+  </div>
 
-<button type="button" class="mbar" id="mbar" aria-label="Показати результат">
-  <span><small>До списання</small><b id="mb-fuel">0</b> <span style="font-weight:600">л</span></span>
-  <span class="mb-side"><span id="mb-km">0 км</span><br><span id="mb-ad">ADBLUE 0,0 л</span></span>
-</button>
+  <a class="btn btn-main" id="go" href="https://4tankova.github.io/Odin/">Перейти зараз <span>→</span></a>
+  <div class="row">
+    <button class="link" id="stay" type="button">Залишитись на цій сторінці</button>
+  </div>
 
-<div id="toast" class="toast" role="status" aria-live="polite"></div>
-<div id="print-report"></div>
+  <div class="note" id="note">
+    <b>Що робити далі:</b>
+    <ul>
+      <li>Оновіть закладку або ярлик на робочому столі на нову адресу.</li>
+      <li id="data-line">Ваша ліцензія та історія розрахунків збережуться.</li>
+    </ul>
+  </div>
+</main>
+
+<div class="toast" id="toast" role="status"></div>
 
 <script>
 (() => {
-'use strict';
+  const TARGET = 'https://4tankova.github.io/Odin/';
+  const SECONDS = 5;
+  const $ = id => document.getElementById(id);
 
-const MONETIZATION_CONFIG = {
-  maxFreeSessions: 5,
-  salt: "FUEL_SECRET_SALT_2025"
-};
+   const dest = TARGET + (location.search || '') + (location.hash || '');
+  $('go').href = dest;
 
-const LS = {
-  get(k, d = null) { try { const v = localStorage.getItem(k); return v === null ? d : v; } catch { return d; } },
-  set(k, v) { try { localStorage.setItem(k, v); } catch {} },
-  del(k) { try { localStorage.removeItem(k); } catch {} },
-  json(k, d) { try { return JSON.parse(localStorage.getItem(k)) ?? d; } catch { return d; } },
-  setJson(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} }
-};
-const $ = id => document.getElementById(id);
+  const onTarget = location.href.replace(/[?#].*$/, '').replace(/index\.html$/, '') === TARGET;
 
-const NUM_IDS = ['base_rate','tons','zam_load','zam_no','city_load','city_no','low_load','low_no','hours'];
-const BAL_IDS = ['fuel_start','fuel_added'];
-const ALL_NUM = [...NUM_IDS, ...BAL_IDS];
-const INPUTS_KEY = 'fuel_calc_inputs';
-const HISTORY_KEY = 'fuel_calc_history';
-const VEH_KEY = 'fuel_calc_vehicles';
-const THEME_KEY = 'fuel_calc_theme';
-const FUEL_TYPES = { diesel: { name: 'Дизель', perTon: 1.3 }, petrol: { name: 'Бензин', perTon: 2.0 } };
-const CITY_COEF = { 5: 1.05, 10: 1.10, 15: 1.15 };
-const radioVal = name => (document.querySelector(`input[name="${name}"]:checked`) || {}).value;
-const setRadio = (name, val) => { const el = document.querySelector(`input[name="${name}"][value="${val}"]`); if (el) el.checked = true; };
-const fuelType = () => FUEL_TYPES[radioVal('fuel_type')] ? radioVal('fuel_type') : 'diesel';
-const cityPct = () => CITY_COEF[radioVal('city_pct')] ? +radioVal('city_pct') : 10;
-const MONTHS = ['Січень','Лютий','Березень','Квітень','Травень','Червень','Липень','Серпень','Вересень','Жовтень','Листопад','Грудень'];
-let currentVehicle = '';
-let lastResult = null;
+  $('old-url').textContent = (location.host + location.pathname).replace(/\/index\.html$/, '/').replace(/\/$/, '') || 'ця сторінка';
 
-const LICENSE_SERVER = 'https://script.google.com/macros/s/AKfycbwWJ3plNJgz_WStYY4_zwICON16S3jrrsVRrbXz2tSlGfY7TKDsZZywRyPfdJy7UgDw/exec';
-const LICENSE_PUBLIC_KEY = `-----BEGIN PUBLIC KEY-----
-MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA6hqvS6Utst+85cVXRXig
-2asH2ZWvMfdtcLPKMMcu2WE2tQqKgT/6wwica+Rxd2w6+K0d7hbqqeatN8ldUMgo
-WRv75sI9poO8y0prmaDxs2As25SWMD12r9MA8dOKvmn9YuB9KIFyeQk5sa5CrTyy
-IVsZh5XWgNSmbl5U2C8Ie8AuxjRJZvTJYXAeXqsBkHWU3l54pZCNSHBZv7JcdHaY
-ymosnUaO09s6TH8cxzNK2uQzMGNPTPup86CuqJlvAndqQ6aMpIOk6ReoYWmH1z8r
-RZD+6DSFPmNLyitxK6WcnQtxZfpyw/62FD7r5+ze+dj/vtPBOtBWyz+kDyoGK2FG
-zwIDAQAB
------END PUBLIC KEY-----`;
-const APP_VERSION = '2.1';
-const DEVICE_RE = /^UA-[A-Z0-9]{4}(-[A-Z0-9]{4})?$/;
-
-const LIC = { active: false, blocked: false, key: '', checkedAt: 0 };
-let DEVICE_ID = '';
-
-const IDB = {
-  _p: null,
-  open() {
-    if (!this._p) this._p = new Promise(resolve => {
-      try {
-        const req = indexedDB.open('fuel_calc', 1);
-        req.onupgradeneeded = () => req.result.createObjectStore('kv');
-        req.onsuccess = () => resolve(req.result);
-        req.onerror = () => resolve(null);
-        setTimeout(() => resolve(null), 1500);
-      } catch { resolve(null); }
-    });
-    return this._p;
-  },
-  async get(k) {
-    const db = await this.open();
-    if (!db) return null;
-    return new Promise(res => {
-      try { const r = db.transaction('kv').objectStore('kv').get(k); r.onsuccess = () => res(r.result ?? null); r.onerror = () => res(null); }
-      catch { res(null); }
-    });
-  },
-  async put(k, v) {
-    const db = await this.open();
-    if (!db) return;
-    return new Promise(res => {
-      try {
-        const tx = db.transaction('kv', 'readwrite');
-        v == null ? tx.objectStore('kv').delete(k) : tx.objectStore('kv').put(v, k);
-        tx.oncomplete = tx.onerror = tx.onabort = () => res();
-      } catch { res(); }
-    });
+    if (location.hostname !== '4tankova.github.io') {
+    $('data-line').innerHTML = 'Якщо ліцензія не підхопилась — відкрийте «Активація пристрою» і введіть свій ключ, вона відновиться.';
   }
-};
-const Cookie = {
-  get(k) { try { const m = document.cookie.match(new RegExp('(?:^|; )' + k + '=([^;]*)')); return m ? decodeURIComponent(m[1]) : null; } catch { return null; } },
-  set(k, v) { try { document.cookie = v == null ? `${k}=; max-age=0; path=/` : `${k}=${encodeURIComponent(v)}; max-age=315360000; path=/; SameSite=Lax`; } catch {} }
-};
-const STORE = { id: 'fuel_calc_device_id', lic: 'fuel_calc_license', key: 'fuel_calc_active_key', sess: 'fuel_calc_session_count' };
 
-async function persistGet(name) {
-  const k = STORE[name];
-  let v = LS.get(k);
-  if (v == null) v = Cookie.get('fc_' + name);
-  if (v == null) v = await IDB.get(k);
-  return v;
-}
-function persistSet(name, v) {
-  const k = STORE[name];
-  if (v == null) LS.del(k); else LS.set(k, v);
-  Cookie.set('fc_' + name, v);
-  IDB.put(k, v);
-}
-
-function newDeviceId() {
-  const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
-  const rnd = n => {
-    let s = '';
-    const a = new Uint32Array(n);
-    try { crypto.getRandomValues(a); } catch { for (let i = 0; i < n; i++) a[i] = Math.random() * 4294967296; }
-    for (let i = 0; i < n; i++) s += chars[a[i] % chars.length];
-    return s;
+  const word = n => {
+    const a = n % 10, b = n % 100;
+    if (a === 1 && b !== 11) return 'секунда';
+    if (a >= 2 && a <= 4 && (b < 12 || b > 14)) return 'секунди';
+    return 'секунд';
   };
-  return 'UA-' + rnd(4) + '-' + rnd(4);
-}
 
-async function restoreIdentity() {
-  let id = String((await persistGet('id')) || '').toUpperCase();
-  if (!DEVICE_RE.test(id)) id = newDeviceId();
-  DEVICE_ID = id;
-  persistSet('id', id);
-  for (const n of ['lic', 'key']) {
-    const v = await persistGet(n);
-    if (v != null) persistSet(n, v);
+  const bar = $('bar');
+  const L = 2 * Math.PI * 44;
+  bar.style.strokeDasharray = L;
+  bar.style.strokeDashoffset = 0;
+
+  let left = SECONDS * 1000, last = performance.now(), paused = false, done = false;
+  function go() {
+    if (done) return;
+    done = true;
+    location.replace(dest);
   }
-  const s = [LS.get(STORE.sess), Cookie.get('fc_sess'), await IDB.get(STORE.sess)].map(x => parseInt(x, 10) || 0);
-  persistSet('sess', String(Math.max(...s)));
-  try { navigator.storage && navigator.storage.persist && navigator.storage.persist(); } catch {}
-}
-
-function getDeviceId() { return DEVICE_ID; }
-
-function generateValidKey(deviceId) {
-  const combined = deviceId + MONETIZATION_CONFIG.salt;
-  let hash = 0;
-  for (let i = 0; i < combined.length; i++) {
-    hash = (hash << 5) - hash + combined.charCodeAt(i);
-    hash |= 0;
+  function tick(now) {
+    if (done) return;
+    if (!paused) {
+      left -= now - last;
+      if (left <= 0) { bar.style.strokeDashoffset = L; $('sec').textContent = '0'; return go(); }
+      const s = Math.ceil(left / 1000);
+      $('sec').textContent = s;
+      $('sec-label').textContent = word(s);
+      bar.style.strokeDashoffset = L * (1 - left / (SECONDS * 1000));
+    }
+    last = now;
+    requestAnimationFrame(tick);
   }
-  return "KEY-" + Math.abs(hash).toString(16).toUpperCase();
-}
-
-function b64uToBytes(s) {
-  s = s.replace(/-/g, '+').replace(/_/g, '/');
-  while (s.length % 4) s += '=';
-  return Uint8Array.from(atob(s), c => c.charCodeAt(0));
-}
-let pubKeyP = null;
-function pubKey() {
-  if (!pubKeyP) {
-    const der = b64uToBytes(LICENSE_PUBLIC_KEY.replace(/-----[^-]+-----|\s/g, ''));
-    pubKeyP = crypto.subtle.importKey('spki', der, { name: 'RSASSA-PKCS1-v1_5', hash: 'SHA-256' }, false, ['verify']);
-  }
-  return pubKeyP;
-}
-async function verifyLic(lic) {
-  if (!lic || typeof lic !== 'object' || typeof lic.p !== 'string' || typeof lic.s !== 'string') return null;
-  let p;
-  try { p = JSON.parse(lic.p); } catch { return null; }
-  if (!p || p.d !== DEVICE_ID) return null;
-  if (!(window.crypto && crypto.subtle)) return p; 
-  try {
-    const ok = await crypto.subtle.verify('RSASSA-PKCS1-v1_5', await pubKey(), b64uToBytes(lic.s), new TextEncoder().encode(lic.p));
-    return ok ? p : null;
-  } catch { return null; }
-}
-
-async function loadLicense() {
-  LIC.active = false; LIC.blocked = false; LIC.key = '';
-  const lk = LS.get(STORE.key);
-  if (lk && lk === generateValidKey(DEVICE_ID)) { LIC.active = true; LIC.key = lk; }
-  const p = await verifyLic(LS.json(STORE.lic, null));
-  if (p) {
-    LIC.checkedAt = p.t || 0;
-    if (p.st === 'active') { LIC.active = true; LIC.key = p.k || LIC.key; }
-    else if (p.st === 'blocked') { LIC.active = false; LIC.blocked = true; }
-  }
-}
-
-async function applyLic(lic) {
-  const p = await verifyLic(lic);
-  if (!p) return false;
-  const wasA = LIC.active, wasB = LIC.blocked;
-  if (p.st === 'active') {
-    persistSet('lic', JSON.stringify(lic));
-    if (p.k) persistSet('key', p.k);
-    LIC.active = true; LIC.blocked = false; LIC.key = p.k || LIC.key;
-  } else if (p.st === 'blocked') {
-    persistSet('lic', JSON.stringify(lic));
-    LIC.active = false; LIC.blocked = true;
-  } else if (p.st === 'none' && LIC.blocked) {
-    persistSet('lic', null);
-    await loadLicense();
-  }
-  LIC.checkedAt = p.t || Date.now();
-  if (wasA !== LIC.active || wasB !== LIC.blocked) {
-    updateLicenseUI();
-    render();
-    if (LIC.active && !wasA) toast('✅ Ліцензію активовано. Дякуємо!');
-    if (LIC.blocked && !wasB) toast('⛔ Доступ до калькулятора заблоковано');
-  }
-  return true;
-}
-
-let infoP = null;
-function deviceInfo() {
-  if (infoP) return infoP;
-  infoP = (async () => {
-    const ua = navigator.userAgent || '';
-    let os = 'Інша', osFamily = 'other', model = '', m;
-    if ((m = ua.match(/Android\s?([\d.]*)/))) {
-      os = 'Android ' + (m[1] || ''); osFamily = 'android';
-      const mm = ua.match(/Android[^;)]*;\s*(?:[a-z]{2}[-_][a-zA-Z]{2};\s*)?([^;)]+?)(?:\s+Build\/[^;)]*)?[;)]/);
-      if (mm && mm[1] !== 'K' && !/^wv$/i.test(mm[1])) model = mm[1].trim();
-    } else if (/iPhone|iPad|iPod/.test(ua)) {
-      m = ua.match(/OS (\d+(?:_\d+)*)/); os = 'iOS ' + (m ? m[1].replace(/_/g, '.') : ''); osFamily = 'ios';
-      model = (ua.match(/iPhone|iPad|iPod/) || [''])[0];
-    } else if ((m = ua.match(/Windows NT ([\d.]+)/))) {
-      os = 'Windows ' + ({ '10.0': '10/11', '6.3': '8.1', '6.2': '8', '6.1': '7' }[m[1]] || m[1]); osFamily = 'windows'; model = 'ПК';
-    } else if (/Mac OS X/.test(ua)) { os = 'macOS'; osFamily = 'mac'; model = 'Mac'; }
-    else if (/Linux/.test(ua)) { os = 'Linux'; osFamily = 'linux'; model = 'ПК'; }
-    try {
-      if (navigator.userAgentData && navigator.userAgentData.getHighEntropyValues) {
-        const h = await navigator.userAgentData.getHighEntropyValues(['model', 'platformVersion']);
-        if (h.model) model = h.model;
-        if (osFamily === 'android' && h.platformVersion) os = 'Android ' + h.platformVersion.split('.')[0];
-      }
-    } catch {}
-    const isApk = /;\s*wv\)/.test(ua) || (/Android/.test(ua) && /Version\/[\d.]+/.test(ua) && /Chrome\//.test(ua));
-    const browser = /SamsungBrowser/.test(ua) ? 'Samsung Internet' : /Edg\//.test(ua) ? 'Edge' : /OPR\//.test(ua) ? 'Opera'
-      : /Firefox\//.test(ua) ? 'Firefox' : /Chrome\//.test(ua) ? 'Chrome' : /Safari\//.test(ua) ? 'Safari' : 'Браузер';
-    let tz = '';
-    try { tz = Intl.DateTimeFormat().resolvedOptions().timeZone || ''; } catch {}
-    const sw = screen.width || 0, sh = screen.height || 0;
-    return {
-      model: model || '—', os, osFamily,
-      type: isApk ? 'Додаток (APK)' : browser,
-      screen: `${Math.min(sw, sh)}×${Math.max(sw, sh)}`,
-      lang: (navigator.language || '') + (tz ? ' / ' + tz : ''), tz
-    };
-  })();
-  return infoP;
-}
-
-async function fingerprint() {
-  const i = await deviceInfo();
-  const s = [i.model, i.osFamily, i.screen, window.devicePixelRatio, navigator.hardwareConcurrency, navigator.deviceMemory, i.tz].join('|');
-  let h = 0x811c9dc5;
-  for (let k = 0; k < s.length; k++) { h ^= s.charCodeAt(k); h = Math.imul(h, 0x01000193) >>> 0; }
-  return h.toString(16).padStart(8, '0').toUpperCase();
-}
-
-async function api(body) {
-  if (!LICENSE_SERVER) throw new Error('no-server');
-  const ctl = typeof AbortController !== 'undefined' ? new AbortController() : null;
-  const t = setTimeout(() => ctl && ctl.abort(), 15000);
-  try {
-      const r = await fetch(LICENSE_SERVER, { method: 'POST', body: JSON.stringify(body), signal: ctl ? ctl.signal : undefined, redirect: 'follow' });
-    return await r.json();
-  } finally { clearTimeout(t); }
-}
-async function basePayload(a) {
-  return { a, d: DEVICE_ID, v: APP_VERSION, info: await deviceInfo(), fp: await fingerprint(), sc: getSessionsCount() };
-}
-
-let pinging = false, lastPing = 0;
-async function ping(boot) {
-  if (!LICENSE_SERVER || pinging) return;
-  if (!boot && navigator.onLine === false) return;
-  pinging = true;
-  try {
-    const b = await basePayload('ping');
-    b.boot = !!boot;
-    const tok = LS.json(STORE.lic, null);
-    if (tok) b.tok = tok;
-    const lk = LS.get(STORE.key);
-    if (lk && lk === generateValidKey(DEVICE_ID)) b.lk = lk;
-    const res = await api(b);
-    lastPing = Date.now();
-    if (res && res.ok && res.lic) await applyLic(res.lic);
-  } catch {} finally { pinging = false; }
-}
-
-function getSessionsCount() {
-  return parseInt(LS.get(STORE.sess, '0'), 10) || 0;
-}
-
-function registerSession() {
-  if (isUnlocked()) return;
-  let registered = false;
-  try { registered = !!sessionStorage.getItem('fuel_calc_session_registered'); } catch {}
-  if (!registered) {
-    try { sessionStorage.setItem('fuel_calc_session_registered', 'true'); } catch {}
-    persistSet('sess', String(getSessionsCount() + 1));
-  }
-}
-
-function isUnlocked() { return LIC.active && !LIC.blocked; }
-
-function hasAccess() {
-  if (LIC.blocked) return false;
-  return isUnlocked() || getSessionsCount() < MONETIZATION_CONFIG.maxFreeSessions;
-}
-
-function applyAccessUI() {
-  const ok = hasAccess();
-  $('paywall-lock-screen').classList.toggle('hidden', ok);
-  $('result-wrap').classList.toggle('hidden', !ok);
-  $('lock-title').textContent = LIC.blocked ? 'Пристрій заблоковано' : 'Доступ заблоковано';
-  $('lock-text').textContent = LIC.blocked
-    ? 'Доступ до калькулятора на цьому пристрої закрито розробником. Зверніться у техпідтримку.'
-    : 'Безкоштовні сесії закінчились. Активуйте пристрій, щоб продовжити.';
-  $('go-activate').classList.toggle('hidden', LIC.blocked);
-  return ok;
-}
-
-function updateLicenseUI() {
-  const devId = getDeviceId();
-  $('device-id-text').textContent = devId;
-  const subject = encodeURIComponent(`Активація калькулятора палива [${devId}]`);
-  const body = encodeURIComponent(`Вітаю!\nМій код пристрою: ${devId}\nДодаю квитанцію про оплату для отримання ліцензійного ключа.`);
-  $('email-btn').href = `mailto:renegatduk@gmail.com?subject=${subject}&body=${body}`;
-  $('req-form').classList.toggle('hidden', !LICENSE_SERVER);
-  $('email-btn').classList.toggle('btn-link', !!LICENSE_SERVER);
-  $('email-btn').textContent = LICENSE_SERVER ? 'або надіслати код на пошту' : '✉️ Надіслати код розробнику';
-  if (LS.get('fuel_calc_req_sent')) { $('req-form').classList.add('hidden'); $('req-done').classList.remove('hidden'); }
-
-  const badge = $('trial-badge'), card = $('activation-card'), state = $('lic-state');
-  $('foot-lic').textContent = '';
-  if (LIC.blocked) {
-    badge.className = 'pill pill-bad';
-    badge.textContent = '⛔ Пристрій заблоковано';
-    badge.title = 'Зверніться у техпідтримку';
-    card.classList.add('hidden');
-    return;
-  }
-  if (isUnlocked()) {
-    badge.className = 'pill pill-ok';
-    badge.textContent = '✓ Ліцензія активна';
-    badge.title = 'Натисніть, щоб побачити ключ';
-    card.classList.add('hidden');
-    $('foot-lic').textContent = `Ліцензія ${LIC.key} · Пристрій ${devId} · `;
-    return;
-  }
-  card.classList.remove('hidden');
-  const remaining = Math.max(0, MONETIZATION_CONFIG.maxFreeSessions - getSessionsCount());
-  if (remaining > 0) {
-    badge.className = 'pill pill-info';
-    badge.textContent = `Пробний режим · ${remaining} з ${MONETIZATION_CONFIG.maxFreeSessions}`;
-    state.className = 'state pill-info';
-    state.textContent = `Залишилось ${remaining} з ${MONETIZATION_CONFIG.maxFreeSessions}`;
+  if (onTarget) {
+    $('count').classList.add('paused');
+    $('stay').hidden = true;
   } else {
-    badge.className = 'pill pill-bad';
-    badge.textContent = '🚫 Потрібна активація';
-    state.className = 'state pill-bad';
-    state.textContent = 'Ліміт вичерпано';
-    card.open = true;
+    requestAnimationFrame(tick);
   }
-  badge.title = 'Відкрити активацію';
-}
 
-function openActivation() {
-  const card = $('activation-card');
-  card.open = true;
-  card.scrollIntoView({ behavior: 'smooth', block: 'center' });
-  setTimeout(() => $('activation-key').focus({ preventScroll: true }), 450);
-}
+  $('stay').addEventListener('click', () => {
+    paused = !paused;
+    $('count').classList.toggle('paused', paused);
+    $('stay').textContent = paused ? 'Продовжити відлік' : 'Залишитись на цій сторінці';
+    if (paused) { $('sec').textContent = '⏸'; $('sec-label').textContent = 'пауза'; }
+  });
 
-function actError(msg) {
-  const e = $('act-error');
-  e.textContent = '❌ ' + msg;
-  e.classList.remove('hidden');
-}
+  $('go').addEventListener('click', e => { e.preventDefault(); go(); });
 
-async function performActivation() {
-  const key = $('activation-key').value.trim().toUpperCase().replace(/\s+/g, '');
-  if (!key) return actError('Введіть ключ активації');
-  $('act-error').classList.add('hidden');
-
-  if (key === generateValidKey(DEVICE_ID)) {
-    persistSet('key', key);
-    const was = LIC.active;
-    await loadLicense();
-    updateLicenseUI(); render();
-    if (LIC.blocked) return actError('Цей пристрій заблоковано. Зверніться до розробника.');
-    if (!was) toast('✅ Ліцензію активовано. Дякуємо!');
-    $('activation-key').value = '';
-    ping(false);
-    return;
-  }
-  if (!LICENSE_SERVER) return actError('Невірний ключ активації для цього пристрою');
-
-  const btn = $('activate-btn');
-  btn.disabled = true; btn.textContent = 'Перевірка…';
-  try {
-    const b = await basePayload('activate');
-    b.k = key;
-    const res = await api(b);
-    if (res && res.ok && res.lic && (await applyLic(res.lic)) && LIC.active) {
-      $('activation-key').value = '';
-    } else {
-      actError((res && res.err) || 'Не вдалося активувати. Спробуйте ще раз.');
+  let tt;
+  $('copy').addEventListener('click', async () => {
+    let ok = false;
+    try { await navigator.clipboard.writeText(TARGET); ok = true; }
+    catch {
+      const t = document.createElement('textarea'); t.value = TARGET; document.body.appendChild(t); t.select();
+      try { ok = document.execCommand('copy'); } catch {}
+      t.remove();
     }
-  } catch {
-    actError('Немає зв’язку з сервером. Перевірте інтернет і спробуйте ще раз.');
-  } finally {
-    btn.disabled = false; btn.textContent = 'Активувати';
-  }
-}
-
-async function sendRequest() {
-  const name = $('req-name').value.trim(), contact = $('req-contact').value.trim();
-  if (!name || !contact) { toast('Вкажіть ім’я та телефон'); (name ? $('req-contact') : $('req-name')).focus(); return; }
-  const btn = $('req-btn');
-  btn.disabled = true; btn.textContent = 'Надсилаю…';
-  try {
-    const b = await basePayload('request');
-    Object.assign(b, { name, contact });
-    const res = await api(b);
-    if (!res || !res.ok) throw new Error((res && res.err) || 'error');
-    LS.set('fuel_calc_req_sent', String(Date.now()));
-    $('req-form').classList.add('hidden');
-    $('req-done').classList.remove('hidden');
-    toast('📨 Запит надіслано');
-  } catch {
-    toast('Не вдалося надіслати. Перевірте інтернет або напишіть на пошту.');
-  } finally {
-    btn.disabled = false; btn.textContent = '📨 Надіслати запит на активацію';
-  }
-}
-
-function excelRound(val, digits = 0) {
-  const factor = Math.pow(10, digits);
-  return (val >= 0 ? 1 : -1) * Math.round(Math.abs(val) * factor + 1e-10) / factor;
-}
-function round1(val) { return excelRound(val, 1); }
-function fmt1(val) { return round1(val).toFixed(1).replace('.', ','); }
-function fmtInt(val) { return String(excelRound(val, 0)).replace('.', ','); }
-function lineFuelRaw(distance, rate100, coef) { return (distance * rate100 / 100) * coef; }
-
-function compute(v) {
-  const baseRate = v.base_rate;
-  const tons = v.tons;
-  const perTon = v.perTon ?? 1.3;         
-  const cityPct = v.cityPct ?? 10;         
-  const cityCoef = CITY_COEF[cityPct] ?? 1.10;
-  const hours = v.hours;
-  const kmPerHour = 25;
-
-  const extraLoadRate = tons * perTon;
-  const loadedRate = baseRate + extraLoadRate;
-
-  const roads = [
-    { name: "Заміські дороги", coef: 0.85, coefText: "-15%", load: v.zam_load, no: v.zam_no },
-    { name: "Рух в місті", coef: cityCoef, coefText: "+" + cityPct + "%", load: v.city_load, no: v.city_no },
-    { name: "Рух на понижених передачах", coef: 1.10, coefText: "+10%", load: v.low_load, no: v.low_no }
-  ];
-
-  let totalLoadedRaw = 0, totalEmptyRaw = 0, totalKmLoad = 0, totalKmNo = 0;
-  const loadedLines = [], emptyLines = [];
-
-  roads.forEach(r => {
-    if (r.load > 0) {
-      const fuelRaw = lineFuelRaw(r.load, loadedRate, r.coef);
-      totalLoadedRaw += fuelRaw;
-      totalKmLoad += r.load;
-      loadedLines.push({ name: r.name, coef: r.coef, coefText: r.coefText, km: r.load, fuel: round1(fuelRaw) });
-    }
+    const el = $('toast');
+    el.textContent = ok ? '📋 Адресу скопійовано' : TARGET;
+    el.classList.add('show'); clearTimeout(tt); tt = setTimeout(() => el.classList.remove('show'), 2200);
   });
-  const totalLoaded = round1(totalLoadedRaw);
-
-  roads.forEach(r => {
-    if (r.no > 0) {
-      const fuelRaw = lineFuelRaw(r.no, baseRate, r.coef);
-      totalEmptyRaw += fuelRaw;
-      totalKmNo += r.no;
-      emptyLines.push({ name: r.name, coef: r.coef, coefText: r.coefText, km: r.no, fuel: round1(fuelRaw) });
-    }
-  });
-  const totalEmpty = round1(totalEmptyRaw);
-
-  let hoursFuel = 0, hoursKm = 0;
-  if (hours > 0) {
-    hoursKm = round1(hours * kmPerHour);
-    hoursFuel = round1(hoursKm * baseRate / 100);
-  }
-
-  const totalRaw = round1(totalLoadedRaw + totalEmptyRaw + hoursFuel);
-  const totalRoundedBase = excelRound(totalRaw, 0);
-
-  let acExtra = 0;
-  if (v.ac) acExtra = round1(totalRoundedBase * 4 / 100);
-  let adblueExtra = 0;
-  if (v.adblue) adblueExtra = round1(totalRoundedBase * 4 / 100);
-
-  const fuelToWriteOff = excelRound(totalRoundedBase + acExtra, 0);
-  const totalKm = round1(totalKmLoad + totalKmNo);
-  const actualConsumption = totalKm > 0 ? round1((fuelToWriteOff / totalKm) * 100) : 0;
-
-  return { baseRate, tons, hours, perTon, fuelType: v.fuelType || 'diesel', cityPct, extraLoadRate, loadedRate, loadedLines, emptyLines, totalLoaded, totalEmpty,
-    hoursKm, hoursFuel, totalRaw, totalRoundedBase, ac: v.ac, acExtra, adblue: v.adblue, adblueExtra,
-    fuelToWriteOff, totalKmLoad, totalKmNo, totalKm, actualConsumption };
-}
-
-function evalExpr(str) {
-  const s = String(str).replace(/\s/g, '').replace(/,/g, '.');
-  if (!s) return 0;
-  const terms = s.match(/[+-]?[^+-]+/g) || [];
-  let sum = 0;
-  terms.forEach(t => { const n = parseFloat(t); if (isFinite(n)) sum += n; });
-  return sum;
-}
-function parseNum(str) {
-  const n = evalExpr(str);
-  return isFinite(n) && n > 0 ? n : 0;
-}
-function isExpr(str) { return /\d\s*[+-]\s*\d/.test(String(str)); }
-
-function sanitize(el) {
-  let v = el.value.replace(/[^\d.,+\-]/g, '').replace(/([+\-]){2,}/g, '$1');
-  if (v !== el.value) el.value = v;
-}
-
-function updateEq(el) {
-  const eq = el.parentElement.querySelector('.eq');
-  if (!eq) return;
-  if (isExpr(el.value)) { eq.textContent = '= ' + fmtNum(parseNum(el.value)); eq.classList.remove('hidden'); }
-  else eq.classList.add('hidden');
-}
-function fmtNum(n) { return String(Math.round(n * 1000) / 1000).replace('.', ','); }
-
-function readInputs() {
-  const v = {};
-  NUM_IDS.forEach(id => v[id] = parseNum($(id).value));
-  v.ac = $('ac').checked;
-  v.adblue = $('adblue_enabled').checked;
-  v.fuelType = fuelType();
-  v.perTon = FUEL_TYPES[v.fuelType].perTon;
-  v.cityPct = cityPct();
-  return v;
-}
-
-function snapshot() {
-  const s = {};
-  ALL_NUM.forEach(id => s[id] = $(id).value);
-  s.ac = $('ac').checked;
-  s.adblue_enabled = $('adblue_enabled').checked;
-  s.note = $('note').value;
-  s.vehicle = currentVehicle;
-  s.fuel_type = fuelType();
-  s.city_pct = cityPct();
-  return s;
-}
-
-function restore(s) {
-  if (!s) return;
-  ALL_NUM.forEach(id => { $(id).value = s[id] !== undefined ? s[id] : '0'; updateEq($(id)); });
-  if (s.ac !== undefined) $('ac').checked = !!s.ac;
-  if (s.adblue_enabled !== undefined) $('adblue_enabled').checked = !!s.adblue_enabled;
-  $('note').value = s.note || '';
-  currentVehicle = s.vehicle || '';
-  setRadio('fuel_type', s.fuel_type || 'diesel');
-  setRadio('city_pct', s.city_pct || 10);
-}
-
-function getBalance(r) {
-  const start = parseNum($('fuel_start').value), added = parseNum($('fuel_added').value);
-  if (start <= 0 && added <= 0) return null;
-  return { start, added, used: r ? r.fuelToWriteOff : 0, end: round1(start + added - (r ? r.fuelToWriteOff : 0)) };
-}
-
-function esc(s) { return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
-
-function buildFormula(r) {
-  let h = `
-    <div class="f-box">
-      <div class="f-row"><span>Базова витрата</span><b>${fmt1(r.baseRate)} л/100 км</b></div>
-      <div class="f-row"><span>Тип пального</span><b>${FUEL_TYPES[r.fuelType].name} (+${fmt1(r.perTon)} л/т)</b></div>
-      <div class="f-row"><span>Тоннаж</span><b>${fmt1(r.tons)} т</b></div>
-      <div class="f-row"><span>Додатково від вантажу</span><b>${fmt1(r.extraLoadRate)} л</b></div>
-      <div class="f-row"><span>Витрата з вантажем</span><b>${fmt1(r.loadedRate)} л/100 км</b></div>
-    </div>`;
-
-  if (r.loadedLines.length) {
-    h += `<div class="f-group">З вантажем</div>`;
-    r.loadedLines.forEach(l => {
-      h += `<div class="f-box f-green"><div class="t">${l.name}</div>
-        <div class="calc">${fmt1(l.km)} км × (${fmt1(r.baseRate)} + (${fmt1(r.tons)} × ${fmt1(r.perTon)})) / 100 ${l.coefText} = <b>${fmt1(l.fuel)} л</b></div></div>`;
-    });
-    h += `<div class="f-box f-row"><b>Всього з вантажем</b><b>${fmt1(r.totalLoaded)} л</b></div>`;
-  }
-
-  if (r.emptyLines.length) {
-    h += `<div class="f-group">Без вантажу</div>`;
-    r.emptyLines.forEach(l => {
-      h += `<div class="f-box"><div class="t">${l.name}</div>
-        <div class="calc">${fmt1(l.km)} км × ${fmt1(r.baseRate)} / 100 ${l.coefText} = <b>${fmt1(l.fuel)} л</b></div></div>`;
-    });
-    h += `<div class="f-box f-row"><b>Всього без вантажу</b><b>${fmt1(r.totalEmpty)} л</b></div>`;
-  }
-
-  if (r.hours > 0) {
-    h += `<div class="f-group">Мотогодини</div>
-      <div class="f-box f-indigo"><div class="calc">${fmt1(r.hours)} м/г × 25 км = <b>${fmt1(r.hoursKm)} км</b></div>
-      <div class="calc">${fmt1(r.hoursKm)} км × ${fmt1(r.baseRate)} / 100 = <b>${fmt1(r.hoursFuel)} л</b></div></div>`;
-  }
-
-  h += `<div class="f-group">Загальний підсумок</div>
-    <div class="f-box f-amber">
-      <div class="calc">${fmt1(r.totalLoaded)} + ${fmt1(r.totalEmpty)} + ${fmt1(r.hoursFuel)} = <b>${fmt1(r.totalRaw)} л</b></div>
-      <div class="calc">Округлення загальної витрати: <b>${fmtInt(r.totalRoundedBase)} л</b></div>
-      <div class="calc">Кондиціонер: ${r.ac ? `${fmtInt(r.totalRoundedBase)} × 4 / 100 = <b>${fmt1(r.acExtra)} л</b>` : '<b>вимкнено</b>'}</div>
-      <div class="f-blue">ADBLUE: ${r.adblue ? `${fmtInt(r.totalRoundedBase)} × 4 / 100 = <b>${fmt1(r.adblueExtra)} л</b>` : 'вимкнено'}</div>
-    </div>
-    <div class="f-total"><span>Паливо до списання</span><span>${fmtInt(r.fuelToWriteOff)} л</span></div>`;
-  return h;
-}
-
-function setText(id, text, animate) {
-  const el = $(id);
-  if (el.textContent !== text) {
-    el.textContent = text;
-    if (animate) { el.classList.remove('bump'); void el.offsetWidth; el.classList.add('bump'); }
-  }
-}
-
-function renderBalance(r) {
-  const b = getBalance(r);
-  const line = $('balance-line'), box = $('tank-box');
-  if (!b) { line.classList.add('hidden'); box.classList.add('hidden'); return; }
-  const neg = b.end < 0;
-  line.classList.remove('hidden');
-  line.classList.toggle('neg', neg);
-  $('balance-text').textContent = neg ? '⚠ Перевитрата (не вистачає)' : `Залишок на кінець (${fmt1(b.start)} + ${fmt1(b.added)} − ${fmtInt(b.used)})`;
-  $('balance-val').textContent = fmt1(Math.abs(b.end)) + ' л';
-  if (r) {
-    box.classList.remove('hidden');
-    box.classList.toggle('warn', neg);
-    $('tank-k').textContent = neg ? 'Не вистачає пального' : 'Залишок у баку';
-    $('tank-v').textContent = fmt1(Math.abs(b.end)) + ' л';
-  }
-}
-
-function render() {
-  LS.setJson(INPUTS_KEY, snapshot());
-  renderVehicles();
-  if (!applyAccessUI()) { lastResult = null; renderBalance(null); updateMbar(); return; }
-
-  const r = compute(readInputs());
-  lastResult = r;
-  $('tons-hint').textContent = `+${fmt1(r.perTon)} л/100 км на кожну тонну (${FUEL_TYPES[r.fuelType].name.toLowerCase()})`;
-  setText('total-fuel', fmtInt(r.fuelToWriteOff), true);
-  setText('adblue-top', fmt1(r.adblueExtra) + ' л');
-  $('adblue-box').classList.toggle('off', !r.adblue);
-  setText('total-km', fmt1(r.totalKm) + ' км');
-  setText('total-km-load', fmt1(r.totalKmLoad) + ' км');
-  setText('total-km-no', fmt1(r.totalKmNo) + ' км');
-  setText('actual-consumption', fmt1(r.actualConsumption) + ' л/100 км');
-  $('formula').innerHTML = buildFormula(r);
-  $('mb-fuel').textContent = fmtInt(r.fuelToWriteOff);
-  $('mb-km').textContent = fmt1(r.totalKm) + ' км';
-  $('mb-ad').textContent = r.adblue ? `ADBLUE ${fmt1(r.adblueExtra)} л` : 'ADBLUE вимкнено';
-  renderBalance(r);
-  updateMbar();
-}
-
-let resultVisible = true, inputFocused = false;
-function updateMbar() {
-  const show = !!lastResult && !resultVisible && !inputFocused;
-  $('mbar').classList.toggle('show', show);
-}
-
-function nowStr(d = new Date()) {
-  const p = n => String(n).padStart(2, '0');
-  return `${p(d.getDate())}.${p(d.getMonth() + 1)}.${d.getFullYear()} ${p(d.getHours())}:${p(d.getMinutes())}`;
-}
-
-function reportText() {
-  const r = lastResult;
-  if (!r) return '';
-  const note = $('note').value.trim();
-  const lines = [`⛽ Розрахунок витрати палива — ${nowStr()}`];
-  if (currentVehicle) lines.push(`Авто: ${currentVehicle}`);
-  if (note) lines.push(`Примітка: ${note}`);
-  lines.push('',
-    `Базова витрата: ${fmt1(r.baseRate)} л/100 км`,
-    `Пальне: ${FUEL_TYPES[r.fuelType].name} (+${fmt1(r.perTon)} л/100 км на тонну)`,
-    `Вантаж: ${fmt1(r.tons)} т (з вантажем ${fmt1(r.loadedRate)} л/100 км)`,
-    `Рух в місті: +${r.cityPct}%`,
-    `Пробіг: ${fmt1(r.totalKm)} км (з вантажем ${fmt1(r.totalKmLoad)}, без вантажу ${fmt1(r.totalKmNo)})`);
-  if (r.hours > 0) lines.push(`Мотогодини: ${fmt1(r.hours)} м/г (${fmt1(r.hoursFuel)} л)`);
-  lines.push(`Кондиціонер: ${r.ac ? fmt1(r.acExtra) + ' л' : 'вимкнено'}`,
-    '',
-    `ПАЛИВО ДО СПИСАННЯ: ${fmtInt(r.fuelToWriteOff)} л`);
-  if (r.adblue) lines.push(`ADBLUE: ${fmt1(r.adblueExtra)} л`);
-  lines.push(`Фактична витрата: ${fmt1(r.actualConsumption)} л/100 км`);
-  const b = getBalance(r);
-  if (b) lines.push(`Залишок у баку: ${fmt1(b.end)} л (початок ${fmt1(b.start)} + заправлено ${fmt1(b.added)})`);
-  return lines.join('\n');
-}
-
-function buildPrintReport() {
-  const r = lastResult;
-  const note = $('note').value.trim();
-  const td = (v, cls = '') => `<td class="${cls}">${v}</td>`;
-  let n = 0, rows = '';
-  const lineRow = (l, state, rate) => `<tr>${td(++n, 'c')}${td(esc(l.name))}${td(state)}${td(fmt1(l.km), 'n')}${td(fmt1(rate), 'n')}${td(l.coef.toFixed(2).replace('.', ',') + ' (' + l.coefText + ')', 'n')}${td(fmt1(l.fuel), 'n')}</tr>`;
-
-  r.loadedLines.forEach(l => rows += lineRow(l, 'з вантажем', r.loadedRate));
-  if (r.loadedLines.length) rows += `<tr class="pr-sub"><td colspan="3">Разом з вантажем</td>${td(fmt1(r.totalKmLoad), 'n')}<td></td><td></td>${td(fmt1(r.totalLoaded), 'n')}</tr>`;
-  r.emptyLines.forEach(l => rows += lineRow(l, 'без вантажу', r.baseRate));
-  if (r.emptyLines.length) rows += `<tr class="pr-sub"><td colspan="3">Разом без вантажу</td>${td(fmt1(r.totalKmNo), 'n')}<td></td><td></td>${td(fmt1(r.totalEmpty), 'n')}</tr>`;
-  if (r.hours > 0) rows += `<tr>${td(++n, 'c')}${td('Робота двигуна (' + fmt1(r.hours) + ' м/г × 25 км)')}${td('мотогодини')}${td(fmt1(r.hoursKm), 'n')}${td(fmt1(r.baseRate), 'n')}${td('—', 'c')}${td(fmt1(r.hoursFuel), 'n')}</tr>`;
-  if (!rows) rows = `<tr><td colspan="7" class="c">Пробіг не введено</td></tr>`;
-
-  const b = getBalance(r);
-  const balance = b ? `
-    <div class="pr-h">Баланс пального</div>
-    <table class="pr">
-      <tr><td>Залишок на початок</td>${td(fmt1(b.start) + ' л', 'n')}</tr>
-      <tr><td>Заправлено</td>${td(fmt1(b.added) + ' л', 'n')}</tr>
-      <tr><td>Списано</td>${td(fmtInt(b.used) + ' л', 'n')}</tr>
-      <tr class="pr-sub"><td>${b.end < 0 ? 'Перевитрата' : 'Залишок на кінець'}</td>${td(fmt1(Math.abs(b.end)) + ' л', 'n')}</tr>
-    </table>` : '';
-
-  $('print-report').innerHTML = `
-    <div class="pr-head">
-      <h2>РОЗРАХУНОК ВИТРАТИ ПАЛЬНОГО</h2>
-      <div class="meta">Дата: <b>${esc(nowStr())}</b></div>
-    </div>
-    <div class="pr-info">
-      <div><span>Транспортний засіб:</span> <b>${esc(currentVehicle || '____________________')}</b></div>
-      <div><span>Примітка:</span> <b>${esc(note || '____________________')}</b></div>
-      <div><span>Базова норма:</span> <b>${fmt1(r.baseRate)} л/100 км</b></div>
-      <div><span>Вантаж:</span> <b>${fmt1(r.tons)} т</b> (+${fmt1(r.extraLoadRate)} → ${fmt1(r.loadedRate)} л/100 км)</div>
-      <div><span>Тип пального:</span> <b>${FUEL_TYPES[r.fuelType].name}</b> (+${fmt1(r.perTon)} л/100 км на 1 т)</div>
-      <div><span>Рух в місті:</span> <b>+${r.cityPct}%</b></div>
-    </div>
-
-    <div class="pr-h">Розрахунок за режимами руху</div>
-    <table class="pr">
-      <thead><tr><th class="c" style="width:22px">№</th><th>Режим руху</th><th>Стан</th><th class="n">Пробіг, км</th><th class="n">Норма, л/100 км</th><th class="n">Коеф.</th><th class="n">Витрата, л</th></tr></thead>
-      <tbody>${rows}</tbody>
-    </table>
-
-    <div class="pr-cols">
-      <div>
-        <div class="pr-h">Підсумок</div>
-        <table class="pr">
-          <tr><td>Сума витрат (${fmt1(r.totalLoaded)} + ${fmt1(r.totalEmpty)} + ${fmt1(r.hoursFuel)})</td>${td(fmt1(r.totalRaw) + ' л', 'n')}</tr>
-          <tr><td>Округлена загальна витрата</td>${td(fmtInt(r.totalRoundedBase) + ' л', 'n')}</tr>
-          <tr><td>Кондиціонер (4%)</td>${td(r.ac ? fmt1(r.acExtra) + ' л' : 'вимкнено', 'n')}</tr>
-          <tr class="grand"><td>ПАЛИВО ДО СПИСАННЯ</td>${td(fmtInt(r.fuelToWriteOff) + ' л', 'n')}</tr>
-          <tr class="ad"><td>ADBLUE (4%, окремо від палива)</td>${td(r.adblue ? fmt1(r.adblueExtra) + ' л' : 'вимкнено', 'n')}</tr>
-        </table>
-      </div>
-      <div>
-        <div class="pr-h">Пробіг</div>
-        <table class="pr">
-          <tr><td>З вантажем</td>${td(fmt1(r.totalKmLoad) + ' км', 'n')}</tr>
-          <tr><td>Без вантажу</td>${td(fmt1(r.totalKmNo) + ' км', 'n')}</tr>
-          <tr class="pr-sub"><td>Всього</td>${td(fmt1(r.totalKm) + ' км', 'n')}</tr>
-          <tr><td>Фактична витрата</td>${td(fmt1(r.actualConsumption) + ' л/100 км', 'n')}</tr>
-        </table>
-        ${balance}
-      </div>
-    </div>
-
-    <div class="pr-sign">
-      <div><b>Водій</b><span>(підпис, прізвище та ініціали)</span></div>
-      <div><b>Розрахунок перевірив</b><span>(посада, підпис, прізвище та ініціали)</span></div>
-    </div>
-    <div class="pr-foot">Сформовано калькулятором витрати палива · ${esc(nowStr())}</div>`;
-}
-
-async function copyText(text) {
-  try { await navigator.clipboard.writeText(text); return true; }
-  catch {
-    const el = document.createElement('textarea');
-    el.value = text; el.style.position = 'fixed'; el.style.opacity = '0';
-    document.body.appendChild(el); el.select();
-    let ok = false; try { ok = document.execCommand('copy'); } catch {}
-    document.body.removeChild(el);
-    return ok;
-  }
-}
-
-let toastTimer;
-function toast(msg) {
-  const t = $('toast');
-  t.textContent = msg;
-  t.classList.add('show');
-  clearTimeout(toastTimer);
-  toastTimer = setTimeout(() => t.classList.remove('show'), 2400);
-}
-
-const toNum = s => parseFloat(String(s || '0').replace(',', '.')) || 0;
-
-function renderHistory() {
-  const list = LS.json(HISTORY_KEY, []);
-  const box = $('history');
-  box.innerHTML = '';
-  $('hist-count').textContent = list.length;
-  $('hist-tools').classList.toggle('hidden', !list.length);
-  $('hist-summary').innerHTML = '';
-  if (!list.length) {
-    box.innerHTML = '<div class="empty">Натисніть «💾 Зберегти», щоб розрахунок з’явився тут</div>';
-    return;
-  }
-
-    const d = new Date();
-  const key = String(d.getMonth() + 1).padStart(2, '0') + '.' + d.getFullYear();
-  const month = list.filter(h => String(h.date).slice(3, 10) === key);
-  if (month.length) {
-    const fuel = month.reduce((s, h) => s + toNum(h.fuel), 0);
-    const ad = month.reduce((s, h) => s + toNum(h.adblue), 0);
-    const km = month.reduce((s, h) => s + toNum(h.km), 0);
-    $('hist-summary').innerHTML = `<div class="hsum-title">${MONTHS[d.getMonth()]} ${d.getFullYear()} · ${month.length} розрах.</div>
-      <div class="hsum"><div><small>Паливо</small><b>${fmtInt(fuel)} л</b></div><div><small>ADBLUE</small><b>${fmt1(ad)} л</b></div><div><small>Пробіг</small><b>${fmtInt(km)} км</b></div></div>`;
-  }
-
-  list.forEach((h, idx) => {
-    const item = document.createElement('div');
-    item.className = 'h-item';
-    item.title = 'Відкрити цей розрахунок';
-    const title = [h.vehicle, h.note].filter(Boolean).join(' · ') || 'Без примітки';
-    item.innerHTML = `<div class="h-main"><div class="h-note">${esc(title)}</div>
-      <div class="h-meta">${esc(h.date)} · ${esc(h.km)} км${h.adblue ? ' · ADBLUE ' + esc(h.adblue) + ' л' : ''}</div></div>
-      <div class="h-fuel">${esc(h.fuel)} л</div>
-      <button type="button" class="h-del" aria-label="Видалити">×</button>`;
-    item.addEventListener('click', e => {
-      if (e.target.closest('.h-del')) {
-        const l = LS.json(HISTORY_KEY, []); l.splice(idx, 1); LS.setJson(HISTORY_KEY, l);
-        renderHistory();
-        return;
-      }
-      restore(h.inputs);
-      render();
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-      toast('Розрахунок відновлено');
-    });
-    box.appendChild(item);
-  });
-}
-
-function saveToHistory() {
-  if (!lastResult) return;
-  const r = lastResult;
-  if (r.totalKm <= 0 && r.hours <= 0) { toast('Спочатку введіть пробіг'); return; }
-  const list = LS.json(HISTORY_KEY, []);
-  list.unshift({
-    date: nowStr(), note: $('note').value.trim(), vehicle: currentVehicle,
-    fuel: fmtInt(r.fuelToWriteOff), adblue: r.adblue ? fmt1(r.adblueExtra) : '',
-    km: fmt1(r.totalKm), inputs: snapshot()
-  });
-  LS.setJson(HISTORY_KEY, list.slice(0, 100));
-  renderHistory();
-  toast('💾 Збережено в історію');
-}
-
-function exportCsv() {
-  const list = LS.json(HISTORY_KEY, []);
-  if (!list.length) return;
-  const q = v => '"' + String(v ?? '').replace(/"/g, '""') + '"';
-  const head = ['Дата','Авто','Примітка','Пальне','Місто, %','Базова норма, л/100 км','Тоннаж, т','Мотогодини','Пробіг, км','Паливо до списання, л','ADBLUE, л'];
-  const rows = list.map(h => {
-    const i = h.inputs || {};
-    return [h.date, h.vehicle || '', h.note || '', (FUEL_TYPES[i.fuel_type] || FUEL_TYPES.diesel).name, i.city_pct || 10, i.base_rate || '', i.tons || '', i.hours || '', h.km, h.fuel, h.adblue || ''].map(q).join(';');
-  });
-  const blob = new Blob(['﻿' + [head.map(q).join(';'), ...rows].join('\r\n')], { type: 'text/csv;charset=utf-8' });
-  const a = document.createElement('a');
-  a.href = URL.createObjectURL(blob);
-  const d = new Date();
-  a.download = `palyvo_${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}.csv`;
-  document.body.appendChild(a); a.click(); a.remove();
-  setTimeout(() => URL.revokeObjectURL(a.href), 1000);
-  toast('⬇️ Файл для Excel завантажено');
-}
-
-function renderVehicles() {
-  const list = LS.json(VEH_KEY, []);
-  const box = $('vehicle-chips');
-  const base = parseNum($('base_rate').value);
-  box.innerHTML = '';
-  list.forEach((v, idx) => {
-    const chip = document.createElement('div');
-    chip.className = 'chip' + (currentVehicle === v.name && base === v.base && fuelType() === (v.fuel || 'diesel') ? ' active' : '');
-    chip.innerHTML = `<span class="chip-name">${esc(v.name)}</span><span class="chip-rate">${fmt1(v.base)}${v.fuel === 'petrol' ? ' · бенз.' : ''}</span><button type="button" class="x" aria-label="Видалити">×</button>`;
-    chip.addEventListener('click', e => {
-      if (e.target.closest('.x')) {
-        const l = LS.json(VEH_KEY, []); l.splice(idx, 1); LS.setJson(VEH_KEY, l);
-        if (currentVehicle === v.name) currentVehicle = '';
-        render();
-        return;
-      }
-      $('base_rate').value = String(v.base).replace('.', ',');
-      updateEq($('base_rate'));
-      setRadio('fuel_type', v.fuel || 'diesel');
-      currentVehicle = v.name;
-      render();
-    });
-    box.appendChild(chip);
-  });
-  const add = document.createElement('button');
-  add.type = 'button';
-  add.className = 'chip chip-add';
-  add.textContent = list.length ? '+ Авто' : '+ Зберегти авто з базовою витратою';
-  add.addEventListener('click', () => {
-    if (parseNum($('base_rate').value) <= 0) { toast('Спочатку введіть базову витрату'); $('base_rate').focus(); return; }
-    $('veh-form').classList.add('show');
-    $('veh-name').focus();
-  });
-  box.appendChild(add);
-}
-
-function saveVehicle() {
-  const name = $('veh-name').value.trim();
-  const base = parseNum($('base_rate').value);
-  if (!name) { $('veh-name').focus(); return; }
-  const list = LS.json(VEH_KEY, []).filter(v => v.name !== name);
-  list.push({ name, base, fuel: fuelType() });
-  LS.setJson(VEH_KEY, list);
-  currentVehicle = name;
-  $('veh-name').value = '';
-  $('veh-form').classList.remove('show');
-  render();
-  toast(`🚚 «${name}» збережено`);
-}
-
-function applyTheme(t) {
-  document.documentElement.setAttribute('data-theme', t);
-  document.querySelector('meta[name="theme-color"]').content = t === 'dark' ? '#0b1120' : '#0f766e';
-}
-
-async function init() {
-  const savedTheme = LS.get(THEME_KEY) || (window.matchMedia && matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
-  applyTheme(savedTheme);
-  $('theme-btn').addEventListener('click', () => {
-    const t = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
-    applyTheme(t); LS.set(THEME_KEY, t);
-  });
-
-  ALL_NUM.forEach(id => {
-    const el = $(id);
-    const eq = document.createElement('span');
-    eq.className = 'eq hidden';
-    el.after(eq);
-  });
-
-  await restoreIdentity();
-  await loadLicense();
-  registerSession();
-  updateLicenseUI();
-  restore(LS.json(INPUTS_KEY, null));
-
-  const order = [...ALL_NUM, 'note'];
-  order.forEach((id, i) => {
-    const el = $(id);
-    el.addEventListener('focus', () => setTimeout(() => el.select(), 0));
-    el.addEventListener('keydown', e => {
-      if (e.key === 'Enter') {
-        e.preventDefault();
-        const next = $(order[i + 1]);
-        next ? next.focus() : el.blur();
-      }
-    });
-  });
-  ALL_NUM.forEach(id => {
-    const el = $(id);
-    el.addEventListener('input', () => {
-      sanitize(el);
-      updateEq(el);
-      if (id === 'base_rate') currentVehicle = '';
-      render();
-    });
-    el.addEventListener('blur', () => {
-      if (isExpr(el.value)) { el.value = fmtNum(parseNum(el.value)); updateEq(el); LS.setJson(INPUTS_KEY, snapshot()); }
-      if (el.value === '') el.value = '0';
-    });
-  });
-  ['ac', 'adblue_enabled'].forEach(id => $(id).addEventListener('change', render));
-  document.querySelectorAll('input[name="fuel_type"], input[name="city_pct"]').forEach(el => el.addEventListener('change', render));
-  $('note').addEventListener('input', () => LS.setJson(INPUTS_KEY, snapshot()));
-
-  $('reset-btn').addEventListener('click', () => {
-    ALL_NUM.forEach(id => { $(id).value = '0'; updateEq($(id)); });
-    $('note').value = '';
-    $('ac').checked = true;
-    $('adblue_enabled').checked = true;
-    setRadio('city_pct', 10);
-    currentVehicle = '';
-    render();
-    toast('Поля очищено');
-  });
-
-  $('copy-btn').addEventListener('click', async () => toast(await copyText(reportText()) ? '📋 Звіт скопійовано' : 'Не вдалося скопіювати'));
-  $('share-btn').addEventListener('click', async () => {
-    const text = reportText();
-    if (navigator.share) {
-      try { await navigator.share({ title: 'Розрахунок витрати палива', text }); } catch {}
-    } else {
-      toast(await copyText(text) ? '📋 Звіт скопійовано — вставте у месенджер' : 'Не вдалося скопіювати');
-    }
-  });
-  $('save-btn').addEventListener('click', saveToHistory);
-  $('print-btn').addEventListener('click', () => { buildPrintReport(); window.print(); });
-  window.addEventListener('beforeprint', () => { if (lastResult) buildPrintReport(); });
-
-  $('hist-clear').addEventListener('click', () => {
-    if (confirm('Видалити всю історію розрахунків?')) { LS.del(HISTORY_KEY); renderHistory(); }
-  });
-  $('hist-csv').addEventListener('click', exportCsv);
-
-  $('veh-save').addEventListener('click', saveVehicle);
-  $('veh-cancel').addEventListener('click', () => $('veh-form').classList.remove('show'));
-  $('veh-name').addEventListener('keydown', e => { if (e.key === 'Enter') saveVehicle(); if (e.key === 'Escape') $('veh-form').classList.remove('show'); });
-
-  $('trial-badge').addEventListener('click', () => {
-    if (isUnlocked()) toast(`Ключ: ${LIC.key} · Пристрій: ${DEVICE_ID}`);
-    else openActivation();
-  });
-  $('copy-dev').addEventListener('click', async () => {
-    const id = getDeviceId();
-    toast(await copyText(id) ? `Код ${id} скопійовано` : `Ваш код: ${id}`);
-  });
-  $('activate-btn').addEventListener('click', performActivation);
-  $('activation-key').addEventListener('keydown', e => { if (e.key === 'Enter') performActivation(); });
-  $('activation-key').addEventListener('input', () => $('act-error').classList.add('hidden'));
-  $('go-activate').addEventListener('click', openActivation);
-  $('req-btn').addEventListener('click', sendRequest);
-  $('req-contact').addEventListener('keydown', e => { if (e.key === 'Enter') sendRequest(); });
-
-    if ('IntersectionObserver' in window) {
-    new IntersectionObserver(entries => { resultVisible = entries[0].isIntersecting; updateMbar(); }, { threshold: 0.15 }).observe($('result'));
-  }
-  document.addEventListener('focusin', e => { if (e.target.matches('input')) { inputFocused = true; updateMbar(); } });
-  document.addEventListener('focusout', () => { inputFocused = false; setTimeout(updateMbar, 50); });
-  $('mbar').addEventListener('click', () => $('result').scrollIntoView({ behavior: 'smooth', block: 'start' }));
-
-  renderHistory();
-  render();
-
-    ping(true);
-  window.addEventListener('online', () => ping(false));
-  document.addEventListener('visibilitychange', () => {
-    if (document.visibilityState === 'visible' && Date.now() - lastPing > 10 * 60 * 1000) ping(false);
-  });
-  setInterval(() => ping(false), 6 * 60 * 60 * 1000);
-}
-
-document.addEventListener('DOMContentLoaded', () => { init().catch(e => console.error(e)); });
 })();
 </script>
 </body>
