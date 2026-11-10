@@ -528,7 +528,7 @@ footer{text-align:center;color:var(--faint);font-size:12px;margin-top:26px}
             <div id="req-form" class="req hidden">
               <div class="req-grid">
                 <input type="text" id="req-name" class="inp" maxlength="60" autocomplete="name" placeholder="Ім’я / позивний">
-                <input type="text" id="req-contact" class="inp" maxlength="60" autocomplete="tel" placeholder="Телефон або Telegram">
+                <input type="text" id="req-contact" class="inp" maxlength="60" autocomplete="tel" placeholder="Телефон">
               </div>
               <button type="button" class="btn btn-dark" id="req-btn">📨 Надіслати запит на активацію</button>
               <p class="hint">Після підтвердження оплати ліцензія увімкнеться сама — достатньо відкрити калькулятор з інтернетом.</p>
@@ -989,7 +989,7 @@ async function performActivation() {
 
 async function sendRequest() {
   const name = $('req-name').value.trim(), contact = $('req-contact').value.trim();
-  if (!name || !contact) { toast('Вкажіть ім’я та телефон / Telegram'); (name ? $('req-contact') : $('req-name')).focus(); return; }
+  if (!name || !contact) { toast('Вкажіть ім’я та телефон'); (name ? $('req-contact') : $('req-name')).focus(); return; }
   const btn = $('req-btn');
   btn.disabled = true; btn.textContent = 'Надсилаю…';
   try {
