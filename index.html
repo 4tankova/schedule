@@ -6,7 +6,6 @@
 <meta name="theme-color" content="#0f766e">
 <title>Розрахунок витрати палива</title>
 <script>
-// Тему ставимо до відмальовки сторінки — без "спалаху" світлої теми
 (function(){try{var t=localStorage.getItem('fuel_calc_theme')||(matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light');document.documentElement.setAttribute('data-theme',t);}catch(e){}})();
 </script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -47,7 +46,6 @@ button{cursor:pointer}
 a{color:inherit}
 .container{max-width:1240px;margin:0 auto;padding:clamp(14px,3vw,28px) clamp(12px,3vw,24px) 48px}
 
-/* ---------- Шапка ---------- */
 .top{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:14px;margin-bottom:var(--gap)}
 .brand{display:flex;align-items:center;gap:14px;min-width:0}
 .logo{width:50px;height:50px;flex-shrink:0;border-radius:16px;display:grid;place-items:center;font-size:24px;
@@ -74,7 +72,6 @@ a.pill:hover,button.pill:hover{transform:translateY(-1px);box-shadow:var(--shado
 }
 @media(min-width:561px){.pill .lbl-short{display:none}}
 
-/* ---------- Сітка сторінки ---------- */
 .layout{display:grid;grid-template-columns:minmax(0,1fr);gap:var(--gap);align-items:start}
 @media(min-width:1080px){.layout{grid-template-columns:minmax(0,7fr) minmax(0,5fr)}.side{position:sticky;top:16px}}
 .card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);box-shadow:var(--shadow);padding:clamp(16px,3vw,28px);min-width:0}
@@ -86,7 +83,6 @@ a.pill:hover,button.pill:hover{transform:translateY(-1px);box-shadow:var(--shado
 .section-title{flex-wrap:wrap;row-gap:2px}
 @media(max-width:560px){.tip{display:none}}
 
-/* ---------- Поля ---------- */
 .grid2{display:grid;grid-template-columns:minmax(0,1fr);gap:14px}
 @media(min-width:520px){.grid2{grid-template-columns:repeat(2,minmax(0,1fr))}}
 .field{display:block;min-width:0}
@@ -101,7 +97,6 @@ a.pill:hover,button.pill:hover{transform:translateY(-1px);box-shadow:var(--shado
 .eq{flex-shrink:0;margin-right:8px;font-size:12px;font-weight:700;color:var(--primary);background:var(--primary-soft);padding:3px 7px;border-radius:8px;white-space:nowrap}
 .hint{font-size:12px;color:var(--muted);margin-top:6px;min-height:17px}
 
-/* ---------- Авто ---------- */
 .chips{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px}
 .chip{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--border);background:var(--surface-2);border-radius:999px;
   padding:5px 5px 5px 12px;font-size:13px;font-weight:600;transition:all .15s;cursor:pointer;max-width:100%}
@@ -117,7 +112,6 @@ a.pill:hover,button.pill:hover{transform:translateY(-1px);box-shadow:var(--shado
 .veh-form input{flex:1;min-width:0;border:1.5px solid var(--border);background:var(--surface-2);border-radius:12px;padding:10px 12px;outline:none}
 .veh-form input:focus{border-color:var(--primary)}
 
-/* ---------- Сегментні перемикачі ---------- */
 .seg{display:inline-flex;background:var(--surface);border:1px solid var(--border);border-radius:999px;padding:3px;gap:2px;flex-shrink:0}
 .seg label{position:relative;display:block}
 .seg input{position:absolute;opacity:0;pointer-events:none}
@@ -132,7 +126,6 @@ a.pill:hover,button.pill:hover{transform:translateY(-1px);box-shadow:var(--shado
 .fuel-row .seg small{font-weight:600;opacity:.75;margin-left:4px}
 @media(max-width:420px){.fuel-row{flex-direction:column;align-items:stretch}.fuel-row .seg{display:grid;grid-template-columns:1fr 1fr}.fuel-row .seg span{text-align:center}}
 
-/* ---------- Дороги ---------- */
 .roads{display:flex;flex-direction:column;gap:12px}
 .road{border-radius:18px;padding:14px 14px 14px 20px;border:1px solid var(--border);background:var(--surface-2);position:relative;overflow:hidden}
 .road::before{content:'';position:absolute;left:0;top:0;bottom:0;width:5px;background:var(--c)}
@@ -146,7 +139,6 @@ a.pill:hover,button.pill:hover{transform:translateY(-1px);box-shadow:var(--shado
 .road-city{--c:var(--amber);--cs:var(--amber-soft)}
 .road-low{--c:var(--rose);--cs:var(--rose-soft)}
 
-/* ---------- Перемикачі ---------- */
 .switch{display:flex;align-items:center;gap:14px;cursor:pointer;padding:14px 16px;border:1px solid var(--border);border-radius:16px;background:var(--surface-2);height:100%;min-width:0}
 .switch input{appearance:none;-webkit-appearance:none;width:46px;height:28px;border-radius:999px;background:var(--border-strong);position:relative;flex-shrink:0;transition:background .2s;cursor:pointer;margin:0}
 .switch input::after{content:'';position:absolute;top:3px;left:3px;width:22px;height:22px;border-radius:50%;background:#fff;transition:transform .2s;box-shadow:0 1px 3px rgba(0,0,0,.25)}
@@ -159,7 +151,6 @@ a.pill:hover,button.pill:hover{transform:translateY(-1px);box-shadow:var(--shado
 .balance-line b{white-space:nowrap;font-size:18px;font-variant-numeric:tabular-nums}
 .balance-line.neg{background:var(--rose-soft);border-color:transparent;color:var(--rose)}
 
-/* ---------- Кнопки ---------- */
 .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border-radius:14px;padding:11px 16px;font-weight:600;font-size:14px;
   border:1px solid var(--border);background:var(--surface);transition:all .15s;text-decoration:none;line-height:1.2}
 .btn:hover{border-color:var(--primary);transform:translateY(-1px)}
@@ -172,7 +163,6 @@ a.pill:hover,button.pill:hover{transform:translateY(-1px);box-shadow:var(--shado
 .tip{font-size:12px;color:var(--muted);align-self:center}
 .tip kbd{font-family:inherit;font-weight:700;background:var(--surface-2);border:1px solid var(--border);border-radius:6px;padding:1px 6px}
 
-/* ---------- Результат ---------- */
 .result{border-radius:var(--r);padding:clamp(18px,3vw,26px);color:#fff;position:relative;overflow:hidden;
   background:radial-gradient(500px 220px at 100% 0%,rgba(52,211,153,.35),transparent 60%),linear-gradient(145deg,#064e3b,#047857 55%,#059669);
   box-shadow:var(--shadow-lg)}
@@ -199,12 +189,10 @@ a.pill:hover,button.pill:hover{transform:translateY(-1px);box-shadow:var(--shado
 .result-actions .btn{flex-direction:column;gap:4px;padding:11px 4px;font-size:12px}
 .result-actions .btn span:first-child{font-size:18px}
 
-/* ---------- Блокування ---------- */
 .lock{text-align:center;border-radius:var(--r);padding:30px 22px;background:linear-gradient(160deg,#0f172a,#1e1b2e);color:#fff;border:1px solid rgba(244,63,94,.35);box-shadow:var(--shadow-lg)}
 .lock h2{color:#fb7185;margin:8px 0 6px;font-size:21px}
 .lock p{color:#cbd5e1;font-size:14px;margin:0 0 18px}
 
-/* ---------- Згортні картки ---------- */
 details.card{padding:0}
 details.card>summary{list-style:none;cursor:pointer;display:flex;align-items:center;gap:10px;font-weight:700;font-size:16px;padding:16px clamp(16px,3vw,24px);border-radius:var(--r)}
 details.card>summary::-webkit-details-marker{display:none}
@@ -214,7 +202,6 @@ details[open].card>summary .chev{transform:rotate(180deg)}
 details.card>.d-body{padding:0 clamp(16px,3vw,24px) clamp(16px,3vw,24px)}
 .state{font-size:12px;font-weight:700;padding:4px 10px;border-radius:999px;white-space:nowrap}
 
-/* ---------- Деталізація ---------- */
 .formula{display:flex;flex-direction:column;gap:8px;font-size:14px}
 .f-group{font-weight:700;font-size:13px;margin-top:8px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em}
 .f-box{border-radius:12px;padding:10px 14px;border:1px solid var(--border);background:var(--surface-2)}
@@ -229,7 +216,6 @@ details.card>.d-body{padding:0 clamp(16px,3vw,24px) clamp(16px,3vw,24px)}
 .f-total span:last-child{color:var(--green)}
 .f-blue{color:var(--primary);font-weight:600}
 
-/* ---------- Історія ---------- */
 .hsum{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-bottom:12px}
 .hsum div{background:var(--surface-2);border:1px solid var(--border);border-radius:12px;padding:8px 10px;min-width:0}
 .hsum small{display:block;font-size:11px;color:var(--muted);font-weight:600}
@@ -247,7 +233,6 @@ details.card>.d-body{padding:0 clamp(16px,3vw,24px) clamp(16px,3vw,24px)}
 .empty{color:var(--muted);font-size:14px;text-align:center;padding:14px;border:1px dashed var(--border);border-radius:14px}
 .h-tools{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap}
 
-/* ---------- Активація ---------- */
 .step{margin-bottom:18px}
 .step-k{font-size:11px;font-weight:800;color:var(--primary);text-transform:uppercase;letter-spacing:.07em;display:block;margin-bottom:8px}
 .pay{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
@@ -273,7 +258,6 @@ details.card>.d-body{padding:0 clamp(16px,3vw,24px) clamp(16px,3vw,24px)}
 
 .hidden{display:none!important}
 
-/* ---------- Мобільна панель результату ---------- */
 .mbar{position:fixed;left:12px;right:12px;bottom:calc(12px + env(safe-area-inset-bottom));z-index:40;display:flex;align-items:center;justify-content:space-between;gap:12px;
   padding:10px 16px;border-radius:18px;color:#fff;background:linear-gradient(135deg,#065f46,#059669);box-shadow:0 12px 30px rgba(5,80,60,.45);
   border:0;text-align:left;transform:translateY(160%);transition:transform .25s ease}
@@ -283,7 +267,6 @@ details.card>.d-body{padding:0 clamp(16px,3vw,24px) clamp(16px,3vw,24px)}
 .mbar .mb-side{text-align:right;font-size:13px;color:#d1fae5;font-variant-numeric:tabular-nums}
 @media(min-width:1080px){.mbar{display:none}}
 
-/* ---------- Сповіщення ---------- */
 .toast{position:fixed;left:50%;bottom:calc(24px + env(safe-area-inset-bottom));transform:translate(-50%,20px);background:#0f172a;color:#fff;padding:12px 18px;border-radius:14px;
   font-size:14px;font-weight:600;box-shadow:var(--shadow-lg);opacity:0;pointer-events:none;transition:all .25s;z-index:60;max-width:calc(100% - 32px);text-align:center}
 .toast.show{opacity:1;transform:translate(-50%,0)}
@@ -292,7 +275,6 @@ details.card>.d-body{padding:0 clamp(16px,3vw,24px) clamp(16px,3vw,24px)}
 footer{text-align:center;color:var(--faint);font-size:12px;margin-top:26px}
 @media(max-width:1079px){footer{margin-bottom:70px}}
 
-/* ---------- Друкований звіт ---------- */
 #print-report{display:none}
 @media print{
   @page{size:A4 portrait;margin:12mm 12mm 14mm}
@@ -347,7 +329,6 @@ footer{text-align:center;color:var(--faint);font-size:12px;margin-top:26px}
   </header>
 
   <div class="layout">
-    <!-- ЛІВА КОЛОНКА: ФОРМА -->
     <main class="card form-col">
 
       <div class="section">
@@ -458,8 +439,7 @@ footer{text-align:center;color:var(--faint);font-size:12px;margin-top:26px}
       </div>
     </main>
 
-    <!-- ПРАВА КОЛОНКА -->
-    <aside class="side stack">
+       <aside class="side stack">
 
       <div id="paywall-lock-screen" class="lock hidden">
         <div style="font-size:48px">🔒</div>
@@ -596,11 +576,7 @@ const MONTHS = ['Січень','Лютий','Березень','Квітень',
 let currentVehicle = '';
 let lastResult = null;
 
-/* ---------- ЛІЦЕНЗУВАННЯ ---------- */
-// Адреса веб-додатка Google Apps Script (закінчується на /exec).
-// Порожньо — калькулятор працює як раніше: лише офлайн-активація старими ключами KEY-…
 const LICENSE_SERVER = 'https://script.google.com/macros/s/AKfycbwWJ3plNJgz_WStYY4_zwICON16S3jrrsVRrbXz2tSlGfY7TKDsZZywRyPfdJy7UgDw/exec';
-// Відкритий ключ для перевірки підпису ліцензій (пара до секретного ключа в Code.gs)
 const LICENSE_PUBLIC_KEY = `-----BEGIN PUBLIC KEY-----
 MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA6hqvS6Utst+85cVXRXig
 2asH2ZWvMfdtcLPKMMcu2WE2tQqKgT/6wwica+Rxd2w6+K0d7hbqqeatN8ldUMgo
@@ -616,8 +592,6 @@ const DEVICE_RE = /^UA-[A-Z0-9]{4}(-[A-Z0-9]{4})?$/;
 const LIC = { active: false, blocked: false, key: '', checkedAt: 0 };
 let DEVICE_ID = '';
 
-/* Надійне сховище: localStorage + IndexedDB + cookie.
-   Якщо одне з них очиститься — дані відновлюються з інших. */
 const IDB = {
   _p: null,
   open() {
@@ -693,7 +667,6 @@ async function restoreIdentity() {
     const v = await persistGet(n);
     if (v != null) persistSet(n, v);
   }
-  // Лічильник пробних сесій: беремо найбільше значення з усіх сховищ
   const s = [LS.get(STORE.sess), Cookie.get('fc_sess'), await IDB.get(STORE.sess)].map(x => parseInt(x, 10) || 0);
   persistSet('sess', String(Math.max(...s)));
   try { navigator.storage && navigator.storage.persist && navigator.storage.persist(); } catch {}
@@ -701,7 +674,6 @@ async function restoreIdentity() {
 
 function getDeviceId() { return DEVICE_ID; }
 
-// Старі ключі KEY-… (офлайн, прив'язані до коду пристрою) — працюють і далі
 function generateValidKey(deviceId) {
   const combined = deviceId + MONETIZATION_CONFIG.salt;
   let hash = 0;
@@ -712,7 +684,6 @@ function generateValidKey(deviceId) {
   return "KEY-" + Math.abs(hash).toString(16).toUpperCase();
 }
 
-/* Перевірка цифрового підпису ліцензії (RSA-SHA256) */
 function b64uToBytes(s) {
   s = s.replace(/-/g, '+').replace(/_/g, '/');
   while (s.length % 4) s += '=';
@@ -731,7 +702,7 @@ async function verifyLic(lic) {
   let p;
   try { p = JSON.parse(lic.p); } catch { return null; }
   if (!p || p.d !== DEVICE_ID) return null;
-  if (!(window.crypto && crypto.subtle)) return p; // старі WebView без криптографії
+  if (!(window.crypto && crypto.subtle)) return p; 
   try {
     const ok = await crypto.subtle.verify('RSASSA-PKCS1-v1_5', await pubKey(), b64uToBytes(lic.s), new TextEncoder().encode(lic.p));
     return ok ? p : null;
@@ -750,8 +721,6 @@ async function loadLicense() {
   }
 }
 
-// Відповідь сервера. Ліцензія НІКОЛИ не знімається через помилку мережі чи порожню відповідь —
-// лише через підписаний статус «заблоковано».
 async function applyLic(lic) {
   const p = await verifyLic(lic);
   if (!p) return false;
@@ -777,7 +746,6 @@ async function applyLic(lic) {
   return true;
 }
 
-/* Дані пристрою для статистики */
 let infoP = null;
 function deviceInfo() {
   if (infoP) return infoP;
@@ -818,7 +786,6 @@ function deviceInfo() {
   return infoP;
 }
 
-// «Відбиток» пристрою: дозволяє перевстановити додаток на тому ж телефоні без зайвого місця в ліцензії
 async function fingerprint() {
   const i = await deviceInfo();
   const s = [i.model, i.osFamily, i.screen, window.devicePixelRatio, navigator.hardwareConcurrency, navigator.deviceMemory, i.tz].join('|');
@@ -832,8 +799,7 @@ async function api(body) {
   const ctl = typeof AbortController !== 'undefined' ? new AbortController() : null;
   const t = setTimeout(() => ctl && ctl.abort(), 15000);
   try {
-    // text/plain — «простий» запит без CORS preflight (так працює Google Apps Script)
-    const r = await fetch(LICENSE_SERVER, { method: 'POST', body: JSON.stringify(body), signal: ctl ? ctl.signal : undefined, redirect: 'follow' });
+      const r = await fetch(LICENSE_SERVER, { method: 'POST', body: JSON.stringify(body), signal: ctl ? ctl.signal : undefined, redirect: 'follow' });
     return await r.json();
   } finally { clearTimeout(t); }
 }
@@ -955,7 +921,6 @@ async function performActivation() {
   if (!key) return actError('Введіть ключ активації');
   $('act-error').classList.add('hidden');
 
-  // Старий ключ KEY-… — працює навіть без інтернету
   if (key === generateValidKey(DEVICE_ID)) {
     persistSet('key', key);
     const was = LIC.active;
@@ -1008,7 +973,6 @@ async function sendRequest() {
   }
 }
 
-/* ---------- МАТЕМАТИКА (формула без змін) ---------- */
 function excelRound(val, digits = 0) {
   const factor = Math.pow(10, digits);
   return (val >= 0 ? 1 : -1) * Math.round(Math.abs(val) * factor + 1e-10) / factor;
@@ -1021,8 +985,8 @@ function lineFuelRaw(distance, rate100, coef) { return (distance * rate100 / 100
 function compute(v) {
   const baseRate = v.base_rate;
   const tons = v.tons;
-  const perTon = v.perTon ?? 1.3;          // дизель 1,3 / бензин 2,0
-  const cityPct = v.cityPct ?? 10;         // 5 / 10 / 15 %
+  const perTon = v.perTon ?? 1.3;         
+  const cityPct = v.cityPct ?? 10;         
   const cityCoef = CITY_COEF[cityPct] ?? 1.10;
   const hours = v.hours;
   const kmPerHour = 25;
@@ -1082,8 +1046,6 @@ function compute(v) {
     fuelToWriteOff, totalKmLoad, totalKmNo, totalKm, actualConsumption };
 }
 
-/* ---------- ВВЕДЕННЯ ---------- */
-// Підтримує одне число або суму рейсів: "12,5+30+8" або "100-20"
 function evalExpr(str) {
   const s = String(str).replace(/\s/g, '').replace(/,/g, '.');
   if (!s) return 0;
@@ -1151,7 +1113,6 @@ function getBalance(r) {
   return { start, added, used: r ? r.fuelToWriteOff : 0, end: round1(start + added - (r ? r.fuelToWriteOff : 0)) };
 }
 
-/* ---------- ВІДОБРАЖЕННЯ ---------- */
 function esc(s) { return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
 
 function buildFormula(r) {
@@ -1247,14 +1208,12 @@ function render() {
   updateMbar();
 }
 
-/* ---------- Мобільна панель результату ---------- */
 let resultVisible = true, inputFocused = false;
 function updateMbar() {
   const show = !!lastResult && !resultVisible && !inputFocused;
   $('mbar').classList.toggle('show', show);
 }
 
-/* ---------- ЗВІТ / ПОДІЛИТИСЯ ---------- */
 function nowStr(d = new Date()) {
   const p = n => String(n).padStart(2, '0');
   return `${p(d.getDate())}.${p(d.getMonth() + 1)}.${d.getFullYear()} ${p(d.getHours())}:${p(d.getMinutes())}`;
@@ -1379,7 +1338,6 @@ function toast(msg) {
   toastTimer = setTimeout(() => t.classList.remove('show'), 2400);
 }
 
-/* ---------- ІСТОРІЯ ---------- */
 const toNum = s => parseFloat(String(s || '0').replace(',', '.')) || 0;
 
 function renderHistory() {
@@ -1394,8 +1352,7 @@ function renderHistory() {
     return;
   }
 
-  // Підсумок за поточний місяць
-  const d = new Date();
+    const d = new Date();
   const key = String(d.getMonth() + 1).padStart(2, '0') + '.' + d.getFullYear();
   const month = list.filter(h => String(h.date).slice(3, 10) === key);
   if (month.length) {
@@ -1464,7 +1421,6 @@ function exportCsv() {
   toast('⬇️ Файл для Excel завантажено');
 }
 
-/* ---------- АВТО ---------- */
 function renderVehicles() {
   const list = LS.json(VEH_KEY, []);
   const box = $('vehicle-chips');
@@ -1515,13 +1471,11 @@ function saveVehicle() {
   toast(`🚚 «${name}» збережено`);
 }
 
-/* ---------- ТЕМА ---------- */
 function applyTheme(t) {
   document.documentElement.setAttribute('data-theme', t);
   document.querySelector('meta[name="theme-color"]').content = t === 'dark' ? '#0b1120' : '#0f766e';
 }
 
-/* ---------- СТАРТ ---------- */
 async function init() {
   const savedTheme = LS.get(THEME_KEY) || (window.matchMedia && matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
   applyTheme(savedTheme);
@@ -1530,7 +1484,6 @@ async function init() {
     applyTheme(t); LS.set(THEME_KEY, t);
   });
 
-  // Позначка "= сума" для полів з виразами
   ALL_NUM.forEach(id => {
     const el = $(id);
     const eq = document.createElement('span');
@@ -1621,8 +1574,7 @@ async function init() {
   $('req-btn').addEventListener('click', sendRequest);
   $('req-contact').addEventListener('keydown', e => { if (e.key === 'Enter') sendRequest(); });
 
-  // Мобільна панель: видно, коли картка результату за межами екрана
-  if ('IntersectionObserver' in window) {
+    if ('IntersectionObserver' in window) {
     new IntersectionObserver(entries => { resultVisible = entries[0].isIntersecting; updateMbar(); }, { threshold: 0.15 }).observe($('result'));
   }
   document.addEventListener('focusin', e => { if (e.target.matches('input')) { inputFocused = true; updateMbar(); } });
@@ -1632,8 +1584,7 @@ async function init() {
   renderHistory();
   render();
 
-  // Перевірка ліцензії на сервері: при запуску, при поверненні в додаток, при появі інтернету
-  ping(true);
+    ping(true);
   window.addEventListener('online', () => ping(false));
   document.addEventListener('visibilitychange', () => {
     if (document.visibilityState === 'visible' && Date.now() - lastPing > 10 * 60 * 1000) ping(false);
